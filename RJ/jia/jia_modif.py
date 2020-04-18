@@ -14,7 +14,7 @@ def F(t, v, beta, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI
     return np.array([dS, dQ, dE, dA, dI, dD, dR])
 
 def G(t, v, pars):
-    """Differential equation for SEIR-QAD model"""
+    """Differential equation for SEIR-QAD 2 City model"""
     S = [v[0], v[len(v)//2]]
     Q = [v[1], v[1 + len(v)//2]]
     E = [v[2], v[2 + len(v)//2]]
@@ -39,6 +39,16 @@ def multi_regime(CI, t0, t_par_list):
     for (tj, par) in t_par_list:
         f = lambda t,v: F(t,v, *par)
         res = solve_ivp(f, (t0,tj), CI, t_eval=np.arange(t0+1,tj+1))
+        t0 = tj
+        CI = res.y[:,-1]
+        tmp_results.append(res.y)
+    return np.hstack(tmp_results)
+
+def multi_regime_cidades(CI, t0, t_par_list):
+    tmp_results = [np.array(CI).reshape((-1,1))]
+    for (tj, par) in t_par_list:
+        g = lambda t,v: G(t,v, par)
+        res = solve_ivp(g, (t0,tj), CI, t_eval=np.arange(t0+1,tj+1))
         t0 = tj
         CI = res.y[:,-1]
         tmp_results.append(res.y)
