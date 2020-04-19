@@ -23,7 +23,7 @@ def read_data(df, tipo):
         print('tipos são confirmados ou obitos')
 
 
-def get_data(cidade, T_fim, T_start = '29-03-2020', df):
+def get_data(cidade, df, T_fim, T_start = '29-03-2020'):
     df_cidade = df.loc[df['Municipio'] == cidade]
     n = len(df_cidade)
     df = df_cidade
