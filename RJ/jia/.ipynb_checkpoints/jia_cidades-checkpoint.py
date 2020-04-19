@@ -59,6 +59,6 @@ def new_diagn(res, params):
     return [res[3,:]*epsA[0] + res[4,:]*epsI[0],res[3+len(res)//2,:]*epsA[1] + res[4+len(res)//2,:]*epsI[1]]
 def new_deaths(res, params):
     dI, dD = params[10], params[12]
-    return res[4,:]*dI + res[5,:]*dD
+    return [res[4,:]*dI[0] + res[5,:]*dD[0], res[4+len(res)//2,:]*dI[1] + res[5+len(res)//2,:]*dD[1]]
 def tot_deaths(res):
     return np.sum(res[:,0]) - np.sum(res, axis=0)
