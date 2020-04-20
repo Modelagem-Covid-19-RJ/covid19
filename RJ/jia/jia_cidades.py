@@ -13,6 +13,19 @@ def F(t, v, beta, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI
     dR = gammaA*A + gammaI*I + gammaD*D
     return np.array([dS, dQ, dE, dA, dI, dD, dR])
 
+def F_Quarentena(t, v, betaS, betaQ, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD):
+    """Differential equation for SEIR-QAD model"""
+    S,Q,E,A,I,D,R = v
+    dS = - betaS*S*(I + theta*A) - p*S + lamb*Q
+    dQ = p*S - lamb*Q -betaQ*Q*(I+theta*A)
+    dE = betaS*S*(I + theta*A) - sigma*E + betaQ*Q*(I+theta*A)
+    dA = sigma*(1 - rho)*E - epsA*A - gammaA*A
+    dI = sigma*rho*E - epsI*I - gammaI*I - deathI*I
+    dD = epsA*A + epsI*I - gammaD*D - deathD*D
+    dR = gammaA*A + gammaI*I + gammaD*D
+    return np.array([dS, dQ, dE, dA, dI, dD, dR])
+
+
 def G(t, v, pars):
     """Differential equation for SEIR-QAD 2 City model"""
     S = [v[0], v[len(v)//2]]
