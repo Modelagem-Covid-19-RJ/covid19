@@ -8,7 +8,7 @@ import matplotlib.dates as mdates
 def read_data(df, tipo):
     if tipo == 'confirmados':
         df  = df.drop(columns = ['SEXO', 'IDADE '])
-        df.rename(mapper = {'FX_ETARIA' : 'Faixa Etaria', 'MUNIC_RESIDENCIA': 'Municipio', 'BAIRRO_RESIDENCIA': 'Bairro', 
+        df.rename(mapper = {'FX_ETARIA' : 'Faixa Etaria', 'MUNIC_RESIDENCIA': 'Municipio', 'BAIRRO_RESIDENCIA': 'Bairro',
                                'DT_NOT': 'Data'}, axis = 1, inplace = True)
         c = df.columns
         df[[c[2], c[3]]] = df[[c[3], c[2]]]
@@ -45,3 +45,53 @@ def get_data(cidade, df, T_fim, T_start = '29-03-2020'):
     acumulado_inicial = n - dados[-1]
     dados = [acumulado_inicial + dado for dado in dados]
     return dados, dados_por_dia
+
+def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Data', 'Municipio', 'Casos']):
+    if municipios == 'all':
+        municipios = set(df_conf['Municipio'])
+    else:
+        if skip == True:
+            municipios = set(df_conf[df_conf['Municipio'].str.contains('|'.join(municipios))])
+        else:
+            municipios = set(df_conf[~df_conf['Municipio'].str.contains('|'.join(municipios))])
+
+    ## Configurando os dias
+    dt_start = dt.datetime.strptime(dt_start, '%d-%m-%Y')
+    dt_fim = dt.datetime.strptime(dt_fim, '%d-%m-%Y')
+    days = mdates.drange(dt_start, dt_fim, dt.timedelta(days = 1))
+
+    dt_start = dt.datetime.strftime(dt_start, '%d-%m-%Y')
+    dt_fim = dt.datetime.strftime(dt_fim, '%d-%m-%Y')
+    dates = [dt.datetime.strftime(mdates.num2date(i), '%d-%m-%Y').replace('-','/') for i in days]
+
+    ## Extraindo os dados e organizando em listas para o Dicionario
+    casos = []
+    nome_m = []
+    data_m = []
+    for m in municipios:
+        lst = []
+        lst_m = [m]*len(dates)
+        lst_d = []
+        for d in dates:
+            df = df_conf[df_conf['Municipio'] == m]
+            lst.append(len(df[df['Data'] == d]))
+            lst_d.append(d)
+        nome_m.append(lst_m)
+        casos.append(lst)
+        data_m.append(lst_d)
+
+    ## Criando o Dicionario
+    lst = [[],[],[]]
+    for c, m, d in zip(casos, nome_m, data_m):
+        lst[0] += d
+        lst[1] += m
+        lst[2] += c
+
+    dic = {}
+    for i,h in enumerate(header):
+        dic.update({h: lst[i]})
+
+    ## Transformando o dicionario em DataFrame
+    df = pd.DataFrame(dic)
+
+    return df
