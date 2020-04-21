@@ -13,7 +13,7 @@ def F(t, v, beta, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI
     dR = gammaA*A + gammaI*I + gammaD*D
     return np.array([dS, dQ, dE, dA, dI, dD, dR])
 
-def F_Quarentena(t, v, betaS, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD):
+def F_Quarentena(t, v, betaS, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD, betaQ):
     """Differential equation for SEIR-QAD model"""
     S,Q,E,A,I,D,R = v
     dS = - betaS*S*(I + theta*A) - p*S + lamb*Q
