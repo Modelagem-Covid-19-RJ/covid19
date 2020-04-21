@@ -13,7 +13,7 @@ def F(t, v, beta, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI
     dR = gammaA*A + gammaI*I + gammaD*D
     return np.array([dS, dQ, dE, dA, dI, dD, dR])
 
-def F_Quarentena(t, v, betaS, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD, betaQ):
+def F_Quarentena(t, v, betaS, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD):
     """Differential equation for SEIR-QAD model"""
     S,Q,E,A,I,D,R = v
     dS = - betaS*S*(I + theta*A) - p*S + lamb*Q
@@ -73,14 +73,5 @@ def new_diagn(res, params):
 def new_deaths(res, params):
     dI, dD = params[10], params[12]
     return [res[4,:]*dI[0] + res[5,:]*dD[0], res[4+len(res)//2,:]*dI[1] + res[5+len(res)//2,:]*dD[1]]
-def tot_deaths(res):
-    return np.sum(res[:,0]) - np.sum(res, axis=0)
-
-def new_diagn(res, params):
-    epsA, epsI = params[6], params[8]
-    return res[3,:]*epsA + res[4,:]*epsI
-def new_deaths(res, params):
-    dI, dD = params[10], params[12]
-    return res[4,:]*dI + res[5,:]*dD
 def tot_deaths(res):
     return np.sum(res[:,0]) - np.sum(res, axis=0)
