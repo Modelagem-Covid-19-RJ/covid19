@@ -48,12 +48,12 @@ def get_data(cidade, df, T_fim, T_start = '29-03-2020'):
 
 def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Data', 'Municipio', 'Casos']):
     if municipios == 'all':
-        municipios = set(df_conf['Municipio'])
+        municipios = set(df['Municipio'])
     else:
         if skip == True:
-            municipios = set(df_conf[df_conf['Municipio'].str.contains('|'.join(municipios))])
+            municipios = set(df[df['Municipio'].str.contains('|'.join(municipios))])
         else:
-            municipios = set(df_conf[~df_conf['Municipio'].str.contains('|'.join(municipios))])
+            municipios = set(df[~df['Municipio'].str.contains('|'.join(municipios))])
 
     ## Configurando os dias
     dt_start = dt.datetime.strptime(dt_start, '%d-%m-%Y')
@@ -73,7 +73,7 @@ def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Da
         lst_m = [m]*len(dates)
         lst_d = []
         for d in dates:
-            df = df_conf[df_conf['Municipio'] == m]
+            df = df[df['Municipio'] == m]
             lst.append(len(df[df['Data'] == d]))
             lst_d.append(d)
         nome_m.append(lst_m)
