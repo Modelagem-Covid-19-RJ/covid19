@@ -51,9 +51,9 @@ def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Da
         municipios = set(df['Municipio'])
     else:
         if skip == True:
-            municipios = set(df[df['Municipio'].str.contains('|'.join(municipios))])
+            municipios = set(df[~df['Municipio'].str.contains('|'.join(municipios))]['Municipio'])
         else:
-            municipios = set(df[~df['Municipio'].str.contains('|'.join(municipios))])
+            municipios = set(df[df['Municipio'].str.contains('|'.join(municipios))]['Municipio'])
 
     ## Configurando os dias
     dt_start = dt.datetime.strptime(dt_start, '%d-%m-%Y')
