@@ -95,3 +95,22 @@ def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Da
     df = pd.DataFrame(dic)
 
     return df
+<<<<<<< f606b378b3adf0c531fb89014143476729b56244
+=======
+
+def download_csv(url = 'http://monitoramento.subpav.rio/COVID19/dados_abertos/Dados_indiv_MRJ_covid19.csv', file_name = 'Dados_indiv_MRJ_covid19', ext = 'csv' ):
+    import requests
+    req = requests.get(url)
+    content = req.content
+    now = dt.datetime.now()
+    date = '-'.join([str(now.day - 1), str(now.month), str(now.year)])
+    file_name_1 = f'data_municipios/dados_prefeitura_rio/%s_%s.%s' % (file_name, date, ext)
+    file = open(file_name_1, 'wb')
+    file.write(content)
+    file.close()
+
+    file_name_2 = f'data_municipios/%s.%s' % (file_name, ext)
+    file = open(file_name_2, 'wb')
+    file.write(content)
+    file.close()
+>>>>>>> Alterações na função download_csv
