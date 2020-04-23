@@ -28,13 +28,13 @@ def F_Quarentena(t, v, betaS, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, ga
 
 def G(t, v, pars):
     """Differential equation for SEIR-QAD 2 City model"""
-    S = [v[0], v[len(v)//2]]
-    Q = [v[1], v[1 + len(v)//2]]
-    E = [v[2], v[2 + len(v)//2]]
-    A = [v[3], v[3 + len(v)//2]]
-    I = [v[4], v[4 + len(v)//2]]
-    D = [v[5], v[5 + len(v)//2]]
-    R = [v[6], v[6 + len(v)//2]]
+    S = np.array([v[0], v[len(v)//2]])
+    Q = np.array([v[1], v[1 + len(v)//2]])
+    E = np.array([v[2], v[2 + len(v)//2]])
+    A = np.array([v[3], v[3 + len(v)//2]])
+    I = np.array([v[4], v[4 + len(v)//2]])
+    D = np.array([v[5], v[5 + len(v)//2]])
+    R = np.array([v[6], v[6 + len(v)//2]])
     
     beta, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD, mu, delta = pars
     
@@ -46,7 +46,28 @@ def G(t, v, pars):
     dD = [epsA[0]*A[0] + epsI[0]*I[0] - gammaD[0]*D[0] - deathD[0]*D[0], epsA[1]*A[1] + epsI[1]*I[1] - gammaD[1]*D[1] - deathD[1]*D[1]]
     dR = [gammaA[0]*A[0] + gammaI[0]*I[0] + gammaD[0]*D[0] + mu[1]*R[1] - mu[0]*R[0], gammaA[1]*A[1] + gammaI[1]*I[1] + gammaD[1]*D[1] - mu[1]*R[1] + mu[0]*R[0]]
     return np.array([dS[0], dQ[0], dE[0], dA[0], dI[0], dD[0], dR[0], dS[1], dQ[1], dE[1], dA[1], dI[1], dD[1], dR[1]])
-
+def G_semtroca(t, v, pars):
+    S = np.array([v[0], v[len(v)//2]])
+    Q = np.array([v[1], v[1 + len(v)//2]])
+    E = np.array([v[2], v[2 + len(v)//2]])
+    A = np.array([v[3], v[3 + len(v)//2]])
+    I = np.array([v[4], v[4 + len(v)//2]])
+    D = np.array([v[5], v[5 + len(v)//2]])
+    R = np.array([v[6], v[6 + len(v)//2]])
+    
+    beta, theta, p, lamb, sigma, rho, epsA, gammaA, epsI, gammaI, deathI, gammaD, deathD = pars
+    beta = beta.T
+    theta = theta.T
+    
+    dS = [-S[0]*(beta[0]@(I + theta[0]*A)) - p[0]*S[0] + lamb[0]*Q[0], -S[1]*(beta[1]@(I + theta[1]*A)) - p[1]*S[1] + lamb[1]*Q[1]]
+    dQ = [p[0]*S[0] - lamb[0]*Q[0], p[1]*S[1] - lamb[1]*Q[1]]
+    dE = [S[0]*(beta[0]@(I + theta[0]*A)) - sigma[0]*E[0], S[1]*(beta[1]@(I + theta[1]*A)) - sigma[1]*E[1]]
+    dA = [sigma[0]*(1 - rho[0])*E[0] - epsA[0]*A[0] - gammaA[0]*A[0], sigma[1]*(1 - rho[1])*E[1] - epsA[1]*A[1]- gammaA[1]*A[1]]
+    dI = [sigma[0]*rho[0]*E[0] - epsI[0]*I[0] - gammaI[0]*I[0] - deathI[0]*I[0], sigma[1]*rho[1]*E[1] - epsI[1]*I[1] - gammaI[1]*I[1]]
+    dD = [epsA[0]*A[0] + epsI[0]*I[0] - gammaD[0]*D[0] - deathD[0]*D[0], epsA[1]*A[1] + epsI[1]*I[1] - gammaD[1]*D[1] - deathD[1]*D[1]]
+    dR = [gammaA[0]*A[0] + gammaI[0]*I[0] + gammaD[0]*D[0], gammaA[1]*A[1] + gammaI[1]*I[1] + gammaD[1]*D[1]]
+    
+    return np.array([dS[0], dQ[0], dE[0], dA[0], dI[0], dD[0], dR[0], dS[1], dQ[1], dE[1], dA[1], dI[1], dD[1], dR[1]])
 def multi_regime(CI, t0, t_par_list):
     tmp_results = [np.array(CI).reshape((-1,1))]
     for (tj, par) in t_par_list:
