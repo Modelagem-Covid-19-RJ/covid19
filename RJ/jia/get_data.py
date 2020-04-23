@@ -3,49 +3,104 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime as dt
 import matplotlib.dates as mdates
+import unidecode
 
 
-def read_data(df, tipo):
-    if tipo == 'confirmados':
-        df  = df.drop(columns = ['SEXO', 'IDADE '])
-        df.rename(mapper = {'FX_ETARIA' : 'Faixa Etaria', 'MUNIC_RESIDENCIA': 'Municipio', 'BAIRRO_RESIDENCIA': 'Bairro',
-                               'DT_NOT': 'Data'}, axis = 1, inplace = True)
+def read_data(df, fonte,tipo = 'confirmados'):
+    if fonte == 'prefeitura':
+        df  = df.drop(columns = ['sexo', 'classificação_final', 'dt_inicio_sintomas'])
+        df.rename(mapper = {'faixa_etária' : 'Faixa Etaria', 'bairro_resid__estadia': 'Bairro',
+                            'ap_residencia_estadia': 'AP Residência',
+                               'dt_notific': 'Data', 'evolução': 'Situação atual'}, axis = 1, inplace = True)
         c = df.columns
+        df[[c[1], c[-1]]] = df[[c[-1], c[1]]]
+        df[[c[-2], c[-1]]] = df[[c[-1], c[-2]]]
         df[[c[2], c[3]]] = df[[c[3], c[2]]]
-        df.rename(mapper = {'Bairro':'Data', 'Data':'Bairro'}, axis = 1, inplace = True)
+        df.rename(mapper = {'Bairro':'Situação atual', 'Situação atual':'Faixa etária',
+                            'Faixa Etaria': 'AP Residência', 'AP Residência': 'Bairro'}, axis = 1, inplace = True)
         df = df.drop(labels = len(df)-1, axis = 0)
-        return df
-    elif tipo == 'obitos':
-        df = df.drop(columns = ['SEXO', 'IDADE'])
-        df.rename(mapper = {'FXETARIA':'Faixa Etaria', 'MUN_RES': 'Municipio', 'DT_OBITO':'Data'}, axis = 1, inplace = True)
-        return df
-    else:
-        print('tipos são confirmados ou obitos')
+    if fonte == 'estado':
+        if tipo == 'confirmados':
+            df = df.drop(columns = ['sexo', 'uf', 'dt_sintoma', 'comorbidades', 'dt_obito'])
+            df.rename(mapper = {'idade': 'Idade', 'municipio_res':'Município', 'dt_coleta / dt_notif':'Data',
+                                            'evolucao':'Situação atual'}, axis = 1, inplace = True)
+            c = df.columns
+            df[[c[0],c[2]]] = df[[c[2],c[0]]]
+            df[[c[1],c[-1]]] = df[[c[-1],c[1]]]
+            df[[c[2],c[-1]]] = df[[c[-1],c[2]]]
+            df.rename(mapper = {'Idade':'Data', 'Data':'Município', 'Município':'Situação atual',
+                                                                  'Situação atual': 'Idade'}, axis = 1, inplace = True)
+        elif tipo == 'obitos':
+            c = df.columns
+            df = df.drop(columns = [c[-1], c[-2], 'COMORBIDADE', 'SEXO', 'CONFIRMAÇÃO'])
+            df.rename(mapper={'DIVULGAÇÃO':'Data', 'MUNICÍPIO':'Município', 'IDADE':'Idade'}, axis = 1, inplace = True)
+            df['Município'] = [unidecode.unidecode(str(v).upper()) for v in df['Município']]
+    return df
 
-
-def get_data(cidade, df, T_fim, T_start = '29-03-2020'):
-    df_cidade = df.loc[df['Municipio'] == cidade]
-    n = len(df_cidade)
-    df = df_cidade
-    k = n - len(df_cidade.dropna(subset=['Data']))
-    df_cidade = df_cidade.dropna(subset=['Data'])
-    print('No total ' + str(k) + ' dados foram inutilizados')
-    l = list(df_cidade['Data'])
-    start = dt.datetime.strptime(T_start, "%d-%m-%Y")
-    then = start + dt.timedelta(days=T_fim)
-    days = mdates.drange(start,then,dt.timedelta(days=1))
-    dias = [str(mdates.num2date(v)).split(' ')[0] for v in days]
-    dados_por_dia = len(dias)*[0]
-    df_cidade_new = pd.to_datetime(df_cidade['Data'], dayfirst=True, format='%d/%m/%Y')
-    times =list(df_cidade_new)
-    times = [str(time).split(' ')[0] for time in times]
-    for i, dia in enumerate(dias):
-        dados_por_dia[i] += times.count(dia)
-    dados = [sum(dados_por_dia[:i]) for i in range(1, len(dados_por_dia)+1)]
-    acumulado_inicial = n - dados[-1]
-    dados = [acumulado_inicial + dado for dado in dados]
-    return dados, dados_por_dia
-
+def get_data(local, df, fonte, T_fim, T_start = '29-03-2020'):
+    if fonte == 'estado':
+        if 'Situação atual' in df.columns:
+            df_cidade = df.loc[df['Município'] == local]
+            df_cidade = df_cidade.loc[df_cidade['Situação atual'] != 'NAO']
+            n = len(df_cidade)
+            k = n - len(df_cidade.dropna(subset=['Data']))
+            df_cidade = df_cidade.dropna(subset=['Data'])
+            print('No total ' + str(k) + ' dados foram inutilizados')
+            l = list(df_cidade['Data'])
+            start = dt.datetime.strptime(T_start, "%d-%m-%Y")
+            then = dt.datetime.strptime(T_fim, "%d-%m-%Y")
+            days = mdates.drange(start,then,dt.timedelta(days=1))
+            dias = [str(mdates.num2date(v)).split(' ')[0] for v in days]
+            dados_por_dia = len(dias)*[0]
+            df_cidade_new = pd.to_datetime(df_cidade['Data'], dayfirst=True, format='%d/%m/%Y')
+            times =list(df_cidade_new)
+            times = [str(time).split(' ')[0] for time in times]
+            for i, dia in enumerate(dias):
+                dados_por_dia[i] += times.count(dia)
+            dados = [sum(dados_por_dia[:i]) for i in range(1, len(dados_por_dia)+1)]
+            acumulado_inicial = n - dados[-1]
+            dados = [acumulado_inicial + dado for dado in dados]
+            return dados, dados_por_dia
+        else:
+            df_cidade = df.loc[df['Município'] == local]
+            n = len(df_cidade)
+            df_cidade = df_cidade.dropna(subset=['Data'])
+            l = list(df_cidade['Data'])
+            start = dt.datetime.strptime(T_start, "%d-%m-%Y")
+            then = dt.datetime.strptime(T_fim, "%d-%m-%Y")
+            days = mdates.drange(start,then,dt.timedelta(days=1))
+            dias = [str(mdates.num2date(v)).split(' ')[0] for v in days]
+            dados_por_dia = len(dias)*[0]
+            df_cidade_new = pd.to_datetime(df_cidade['Data'], dayfirst=True, format='%d/%m/%Y')
+            times =list(df_cidade_new)
+            times = [str(time).split(' ')[0] for time in times]
+            for i, dia in enumerate(dias):
+                dados_por_dia[i] += times.count(dia)
+            dados = [sum(dados_por_dia[:i]) for i in range(1, len(dados_por_dia)+1)]
+            acumulado_inicial = n - dados[-1]
+            dados = [acumulado_inicial + dado for dado in dados]
+            return dados, dados_por_dia
+    elif fonte == 'prefeitura':
+        df_bairro = df.loc[df['Bairro'] == local]
+        n = len(df_bairro)
+        k = n - len(df_bairro.dropna(subset=['Data']))
+        df_bairro = df_bairro.dropna(subset=['Data'])
+        print('No total ' + str(k) + ' dados foram inutilizados')
+        l = list(df_bairro['Data'])
+        start = dt.datetime.strptime(T_start, "%d-%m-%Y")
+        then = dt.datetime.strptime(T_fim, "%d-%m-%Y")
+        days = mdates.drange(start,then,dt.timedelta(days=1))
+        dias = [str(mdates.num2date(v)).split(' ')[0] for v in days]
+        dados_por_dia = len(dias)*[0]
+        df_bairro_new = pd.to_datetime(df_bairro['Data'], dayfirst=True, format='%d/%m/%Y')
+        times =list(df_bairro_new)
+        times = [str(time).split(' ')[0] for time in times]
+        for i, dia in enumerate(dias):
+            dados_por_dia[i] += times.count(dia)
+        dados = [sum(dados_por_dia[:i]) for i in range(1, len(dados_por_dia)+1)]
+        acumulado_inicial = n - dados[-1]
+        dados = [acumulado_inicial + dado for dado in dados]
+        return dados, dados_por_dia
 def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Data', 'Municipio', 'Casos']):
     if municipios == 'all':
         municipios = set(df['Municipio'])
