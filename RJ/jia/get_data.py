@@ -30,6 +30,8 @@ def read_data(df, fonte,tipo = 'confirmados'):
             df[[c[2],c[-1]]] = df[[c[-1],c[2]]]
             df.rename(mapper = {'Idade':'Data', 'Data':'Município', 'Município':'Situação atual',
                                                                   'Situação atual': 'Idade'}, axis = 1, inplace = True)
+
+            df['Município'] = [unidecode.unidecode(str(v).upper()) for v in df['Município']]
         elif tipo == 'obitos':
             c = df.columns
             df = df.drop(columns = [c[-1], c[-2], 'COMORBIDADE', 'SEXO', 'CONFIRMAÇÃO'])
@@ -37,7 +39,7 @@ def read_data(df, fonte,tipo = 'confirmados'):
             df['Município'] = [unidecode.unidecode(str(v).upper()) for v in df['Município']]
     return df
 
-def get_data(local, df, fonte, T_fim, T_start = '29-03-2020'):
+def get_data(local, df, fonte, T_fim, T_start = '29-03-2020', to_print = True):
     if fonte == 'estado':
         if 'Situação atual' in df.columns:
             df_cidade = df.loc[df['Município'] == local]
@@ -45,7 +47,8 @@ def get_data(local, df, fonte, T_fim, T_start = '29-03-2020'):
             n = len(df_cidade)
             k = n - len(df_cidade.dropna(subset=['Data']))
             df_cidade = df_cidade.dropna(subset=['Data'])
-            print('No total ' + str(k) + ' dados foram inutilizados')
+            if to_print:
+                print('No total ' + str(k) + ' dados foram inutilizados')
             l = list(df_cidade['Data'])
             start = dt.datetime.strptime(T_start, "%d-%m-%Y")
             then = dt.datetime.strptime(T_fim, "%d-%m-%Y")
@@ -85,7 +88,8 @@ def get_data(local, df, fonte, T_fim, T_start = '29-03-2020'):
         n = len(df_bairro)
         k = n - len(df_bairro.dropna(subset=['Data']))
         df_bairro = df_bairro.dropna(subset=['Data'])
-        print('No total ' + str(k) + ' dados foram inutilizados')
+        if to_print:
+            print('No total ' + str(k) + ' dados foram inutilizados')
         l = list(df_bairro['Data'])
         start = dt.datetime.strptime(T_start, "%d-%m-%Y")
         then = dt.datetime.strptime(T_fim, "%d-%m-%Y")
