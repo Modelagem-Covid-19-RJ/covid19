@@ -1,0 +1,164 @@
+NOME,poptotal,CODBAIRRO,REGIAO_ADM,CODRA,AREA_PLANE,RP,Cod_RP
+Abolição                  ,11356,70,MEIER                   ,13,3,Méier,3.2
+Acari                     ,27347,111,PAVUNA                  ,25,3,Pavuna,3.6
+Água Santa                ,8756,67,MEIER                   ,13,3,Méier,3.2
+Alto da Boa Vista         ,9343,34,TIJUCA                  ,8,2,Tijuca,2.2
+Anchieta                  ,55652,107,ANCHIETA                ,22,3,Pavuna,3.6
+Andaraí                   ,39365,37,VILA ISABEL             ,9,2,Tijuca,2.2
+Anil                      ,24172,116,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Bancários                 ,12512,97,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Bangu,214953,141,BANGU                   ,17,5,Bangu,5.1
+Barra da Tijuca           ,135924,128,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Barra de Guaratiba        ,3577,152,GUARATIBA               ,26,5,Guaratiba,5.4
+Barros Filho              ,14049,112,PAVUNA                  ,25,3,Pavuna,3.6
+Benfica                   ,25081,12,SAO CRISTOVAO           ,7,1,Centro,1.1
+Bento Ribeiro             ,43707,89,MADUREIRA               ,15,3,Madureira,3.3
+Bonsucesso                ,18711,40,RAMOS                   ,10,3,Ramos,3.1
+Botafogo                  ,82890,20,BOTAFOGO                ,4,2,Zona Sul,2.1
+Brás de Pina              ,59222,45,PENHA                   ,11,3,Penha,3.5
+Cachambi                  ,42415,65,MEIER                   ,13,3,Méier,3.2
+Cacuia                    ,11013,93,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Caju                      ,20477,4,PORTUARIA               ,1,1,Centro,1.1
+Camorim                   ,1970,129,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Campinho                  ,10156,78,MADUREIRA               ,15,3,Madureira,3.3
+Campo dos Afonsos         ,1365,136,REALENGO                ,33,5,Bangu,5.1
+Campo Grande,328370,144,CAMPO GRANDE            ,18,5,Campo Grande,5.2
+Cascadura                 ,34456,82,MADUREIRA               ,15,3,Madureira,3.3
+Catete                    ,24057,18,BOTAFOGO                ,4,2,Zona Sul,2.1
+Catumbi                   ,12556,6,RIO COMPRIDO            ,3,1,Centro,1.1
+Cavalcanti                ,16141,80,MADUREIRA               ,15,3,Madureira,3.3
+Centro                    ,29555,5,CENTRO                  ,2,1,Centro,1.1
+Cidade de Deus            ,36515,118,CIDADE DE DEUS          ,34,4,Jacarepaguá,4.1
+Cidade Nova               ,5466,8,RIO COMPRIDO            ,3,1,Centro,1.1
+Cidade Universitária      ,1556,105,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Cocotá                    ,4877,96,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Coelho Neto               ,32423,110,PAVUNA                  ,25,3,Pavuna,3.6
+Colégio                   ,29245,77,IRAJA                   ,14,3,Madureira,3.3
+Complexo do Alemão        ,69143,156,COMPLEXO DO ALEMÃO      ,29,3,Inhaúma,3.4
+Copacabana                ,146392,24,COPACABANA              ,5,2,Zona Sul,2.1
+Cordovil                  ,45202,46,VIGARIO GERAL           ,31,3,Penha,3.5
+Cosme Velho               ,7178,19,BOTAFOGO                ,4,2,Zona Sul,2.1
+Cosmos                    ,77007,147,CAMPO GRANDE            ,18,5,Campo Grande,5.2
+Costa Barros              ,28442,113,PAVUNA                  ,25,3,Pavuna,3.6
+Curicica                  ,31189,119,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Del Castilho              ,15610,53,INHAUMA                 ,12,3,Inhaúma,3.4
+Deodoro                   ,10842,134,REALENGO                ,33,5,Bangu,5.1
+Encantado                 ,15021,68,MEIER                   ,13,3,Méier,3.2
+Engenheiro Leal           ,6113,81,MADUREIRA               ,15,3,Madureira,3.3
+Engenho da Rainha         ,26659,55,INHAUMA                 ,12,3,Inhaúma,3.4
+Engenho de Dentro         ,45540,66,MEIER                   ,13,3,Méier,3.2
+Engenho Novo              ,42172,61,MEIER                   ,13,3,Méier,3.2
+Estácio                   ,17189,9,RIO COMPRIDO            ,3,1,Centro,1.1
+Flamengo                  ,50043,15,BOTAFOGO                ,4,2,Zona Sul,2.1
+Freguesia (Ilha)          ,19437,98,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Freguesia (Jacarepaguá)   ,70511,120,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Galeão                    ,22971,104,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Gamboa                    ,13108,2,PORTUARIA               ,1,1,Centro,1.1
+Gardênia Azul             ,17715,117,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Gávea                     ,16003,29,LAGOA                   ,6,2,Zona Sul,2.1
+Gericinó,15167,160,BANGU                   ,17,5,Bangu,5.1
+Glória                    ,9661,16,BOTAFOGO                ,4,2,Zona Sul,2.1
+Grajaú                    ,38671,38,VILA ISABEL             ,9,2,Tijuca,2.2
+Grumari                   ,167,133,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Guadalupe                 ,47144,106,ANCHIETA                ,22,3,Pavuna,3.6
+Guaratiba                 ,110049,151,GUARATIBA               ,26,5,Guaratiba,5.4
+Higienópolis              ,15734,50,INHAUMA                 ,12,3,Inhaúma,3.4
+Honório Gurgel            ,21989,87,MADUREIRA               ,15,3,Madureira,3.3
+Humaitá                   ,13285,21,BOTAFOGO                ,4,2,Zona Sul,2.1
+Inhaúma                   ,45698,54,INHAUMA                 ,12,3,Inhaúma,3.4
+Inhoaíba                  ,64649,146,CAMPO GRANDE            ,18,5,Campo Grande,5.2
+Ipanema                   ,42743,25,LAGOA                   ,6,2,Zona Sul,2.1
+Irajá                     ,96382,76,IRAJA                   ,14,3,Madureira,3.3
+Itanhangá                 ,38415,127,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Jabour,5346,163,BANGU,17,5,Bangu,5.1
+Jacaré                    ,9276,51,MEIER                   ,13,3,Méier,3.2
+Jacarepaguá               ,157326,115,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Jacarezinho               ,37839,155,JACAREZINHO             ,28,3,Méier,3.2
+Jardim América            ,25226,49,VIGARIO GERAL           ,31,3,Penha,3.5
+Jardim Botânico           ,18009,28,LAGOA                   ,6,2,Zona Sul,2.1
+Jardim Carioca            ,24848,100,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Jardim Guanabara          ,32213,99,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Jardim Sulacap            ,13062,137,REALENGO                ,33,5,Bangu,5.1
+Joá                       ,818,126,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Lagoa                     ,21198,27,LAGOA                   ,6,2,Zona Sul,2.1
+Lapa,11587,161,CENTRO,2,1,Centro,1.1
+Laranjeiras               ,45554,17,BOTAFOGO                ,4,2,Zona Sul,2.1
+Leblon                    ,46044,26,LAGOA                   ,6,2,Zona Sul,2.1
+Leme                      ,14799,23,COPACABANA              ,5,2,Zona Sul,2.1
+Lins de Vasconcelos       ,37487,62,MEIER                   ,13,3,Méier,3.2
+Madureira                 ,50106,83,MADUREIRA               ,15,3,Madureira,3.3
+Magalhães Bastos          ,24430,138,REALENGO                ,33,5,Bangu,5.1
+Mangueira                 ,17835,11,SAO CRISTOVAO           ,7,1,Centro,1.1
+Manguinhos                ,36160,39,RAMOS                   ,10,3,Ramos,3.1
+Maracanã                  ,25256,35,VILA ISABEL             ,9,2,Tijuca,2.2
+Maré                      ,129770,157,COMPLEXO DA MARE        ,30,3,Ramos,3.1
+Marechal Hermes           ,48061,90,MADUREIRA               ,15,3,Madureira,3.3
+Maria da Graça            ,7972,52,INHAUMA                 ,12,3,Inhaúma,3.4
+Méier                     ,49828,63,MEIER                   ,13,3,Méier,3.2
+Moneró                    ,6476,102,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Olaria                    ,57514,42,RAMOS                   ,10,3,Ramos,3.1
+Osvaldo Cruz              ,34040,88,MADUREIRA               ,15,3,Madureira,3.3
+Paciência                 ,94626,148,SANTA CRUZ              ,19,5,Santa Cruz,5.3
+Padre Miguel              ,64228,140,BANGU                   ,17,5,Bangu,5.1
+Paquetá                   ,3361,13,PAQUETA                 ,21,1,Centro,1.1
+Parada de Lucas           ,23923,47,VIGARIO GERAL           ,31,3,Penha,3.5
+Parque Anchieta           ,26212,108,ANCHIETA                ,22,3,Pavuna,3.6
+Parque Colúmbia           ,9202,159,PAVUNA                  ,25,3,Pavuna,3.6
+Pavuna                    ,97350,114,PAVUNA                  ,25,3,Pavuna,3.6
+Pechincha                 ,34709,121,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Pedra de Guaratiba        ,9488,153,GUARATIBA               ,26,5,Guaratiba,5.4
+Penha                     ,78678,43,PENHA                   ,11,3,Penha,3.5
+Penha Circular            ,47816,44,PENHA                   ,11,3,Penha,3.5
+Piedade                   ,43378,69,MEIER                   ,13,3,Méier,3.2
+Pilares                   ,27250,71,MEIER                   ,13,3,Méier,3.2
+Pitangueiras              ,11756,94,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Portuguesa                ,23856,103,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Praça da Bandeira         ,8662,32,TIJUCA                  ,8,2,Tijuca,2.2
+Praça Seca                ,64147,124,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Praia da Bandeira         ,5948,95,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Quintino Bocaiúva         ,31185,79,MADUREIRA               ,15,3,Madureira,3.3
+Ramos                     ,40792,41,RAMOS                   ,10,3,Ramos,3.1
+Realengo                  ,180123,139,REALENGO                ,33,5,Bangu,5.1
+Recreio dos Bandeirantes  ,82240,132,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Riachuelo                 ,12653,59,MEIER                   ,13,3,Méier,3.2
+Ribeira                   ,3528,91,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Ricardo de Albuquerque    ,29310,109,ANCHIETA                ,22,3,Pavuna,3.6
+Rio Comprido              ,43764,7,RIO COMPRIDO            ,3,1,Centro,1.1
+Rocha                     ,8766,58,MEIER                   ,13,3,Méier,3.2
+Rocha Miranda             ,44188,86,MADUREIRA               ,15,3,Madureira,3.3
+Rocinha                   ,69356,154,ROCINHA                 ,27,2,Zona Sul,2.1
+Sampaio                   ,10895,60,MEIER                   ,13,3,Méier,3.2
+Santa Cruz                ,217333,149,SANTA CRUZ              ,19,5,Santa Cruz,5.3
+Santa Teresa              ,40926,14,SANTA TEREZA            ,23,1,Centro,1.1
+Santíssimo                ,41458,143,CAMPO GRANDE            ,18,5,Campo Grande,5.2
+Santo Cristo              ,12330,3,PORTUARIA               ,1,1,Centro,1.1
+São Conrado               ,10980,31,LAGOA                   ,6,2,Zona Sul,2.1
+São Cristóvão             ,26510,10,SAO CRISTOVAO           ,7,1,Centro,1.1
+São Francisco Xavier      ,8343,57,MEIER                   ,13,3,Méier,3.2
+Saúde                     ,2749,1,PORTUARIA               ,1,1,Centro,1.1
+Senador Camará            ,100169,142,BANGU                   ,17,5,Bangu,5.1
+Senador Vasconcelos       ,30600,145,CAMPO GRANDE            ,18,5,Campo Grande,5.2
+Sepetiba                  ,56575,150,SANTA CRUZ              ,19,5,Santa Cruz,5.3
+Tanque                    ,37856,123,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Taquara                   ,102126,122,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Tauá                      ,29567,101,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
+Tijuca                    ,163805,33,TIJUCA                  ,8,2,Tijuca,2.2
+Todos os Santos           ,24646,64,MEIER                   ,13,3,Méier,3.2
+Tomás Coelho              ,22676,56,INHAUMA                 ,12,3,Inhaúma,3.4
+Turiaçú                   ,17246,85,MADUREIRA               ,15,3,Madureira,3.3
+Urca                      ,7061,22,BOTAFOGO                ,4,2,Zona Sul,2.1
+Vargem Grande             ,14039,131,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Vargem Pequena            ,27250,130,BARRA DA TIJUCA         ,24,4,Barra da Tijuca,4.2
+Vasco da Gama             ,15482,158,SAO CRISTOVAO           ,7,1,Centro,1.1
+Vaz Lobo                  ,15167,84,MADUREIRA               ,15,3,Madureira,3.3
+Vicente de Carvalho       ,24964,73,IRAJA                   ,14,3,Madureira,3.3
+Vidigal                   ,12797,30,LAGOA                   ,6,2,Zona Sul,2.1
+Vigário Geral             ,41820,48,VIGARIO GERAL           ,31,3,Penha,3.5
+Vila da Penha             ,25465,74,IRAJA                   ,14,3,Madureira,3.3
+Vila Isabel               ,86018,36,VILA ISABEL             ,9,2,Tijuca,2.2
+Vila Kennedy,28172,162,BANGU                   ,17,5,Bangu,5.1
+Vila Kosmos               ,18274,72,IRAJA                   ,14,3,Madureira,3.3
+Vila Militar              ,13184,135,REALENGO                ,33,5,Bangu,5.1
+Vila Valqueire            ,32279,125,JACAREPAGUA             ,16,4,Jacarepaguá,4.1
+Vista Alegre              ,8622,75,IRAJA                   ,14,3,Madureira,3.3
+Zumbi                     ,2016,92,ILHA DO GOVERNADOR      ,20,3,Ilha do Governador,3.7
