@@ -6,18 +6,17 @@ import matplotlib.dates as mdates
 import unidecode
 
 
-def read_data(df, fonte,tipo = 'confirmados'):
+def read_data(df, fonte, tipo = 'confirmados'):
     if fonte == 'prefeitura':
-        df  = df.drop(columns = ['sexo', 'classificação_final', 'dt_inicio_sintomas'])
+        df  = df.drop(columns = ['sexo', 'classificação_final', 'dt_inicio_sintomas', 'ap_residencia_estadia'])
         df.rename(mapper = {'faixa_etária' : 'Faixa Etaria', 'bairro_resid__estadia': 'Bairro',
-                            'ap_residencia_estadia': 'AP Residência',
-                               'dt_notific': 'Data', 'evolução': 'Situação atual'}, axis = 1, inplace = True)
+                            'dt_notific': 'Data', 'evolução': 'Situação atual'}, axis = 1, inplace = True)
         c = df.columns
-        df[[c[1], c[-1]]] = df[[c[-1], c[1]]]
-        df[[c[-2], c[-1]]] = df[[c[-1], c[-2]]]
-        df[[c[2], c[3]]] = df[[c[3], c[2]]]
-        df.rename(mapper = {'Bairro':'Situação atual', 'Situação atual':'Faixa etária',
-                            'Faixa Etaria': 'AP Residência', 'AP Residência': 'Bairro'}, axis = 1, inplace = True)
+        #df[[c[1], c[-1]]] = df[[c[-1], c[1]]]
+        #df[[c[-2], c[-1]]] = df[[c[-1], c[-2]]]
+        #df[[c[2], c[3]]] = df[[c[3], c[2]]]
+        #df.rename(mapper = {'Bairro':'Situação atual', 'Situação atual':'Faixa etária',
+                            #'Faixa Etaria': 'AP Residência', 'AP Residência': 'Bairro'}, axis = 1, inplace = True)
         df = df.drop(labels = len(df)-1, axis = 0)
     if fonte == 'estado':
         if tipo == 'confirmados':
@@ -168,3 +167,15 @@ def download_csv(url = 'http://monitoramento.subpav.rio/COVID19/dados_abertos/Da
     file = open(file_name, 'wb')
     file.write(content)
     file.close()
+
+def std_names(lst, tbl = 'prefeitura'):
+    if tbl == 'prefeitura':
+        dic = {'Cavalcanti': 'Cavalcante', 'Freguesia (Ilha)': 'Freguesia-Ilha', 'Freguesia (Jacarepaguá)': 'Freguesia-JPA', 'Osvaldo Cruz': 'Oswaldo Cruz', 'Ricardo de Albuquerque': 'Ricardo Albuquerque'}
+        for k, v in dic.items():
+            lst[lst.index(k)] = v
+    return lst
+
+def pair_dicts(lst_k, lst_v):
+    dic_k = {unidecode.unidecode(k.upper()) : k for k in lst_k}
+    dic = {dic_k[v]: v for v in lst_v}
+    return dic
