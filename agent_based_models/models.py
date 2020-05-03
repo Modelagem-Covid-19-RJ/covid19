@@ -9,7 +9,7 @@ def evolui(modelo, pop, params):
     
     if modelo == 'SIR':
         
-        indices = [i for i in range(len(pop))]
+        indices = list(range(len(pop)))
         p = np.random.permutation(indices)
         ciclos = Permutation(p).cyclic_form
         new_pop = pop.copy()
@@ -46,7 +46,7 @@ def evolui(modelo, pop, params):
     
     elif modelo == 'SEIR':
         
-        indices = [i for i in range(len(pop))]
+        indices = list(range(len(pop)))
         p = np.random.permutation(indices)
         ciclos = Permutation(p).cyclic_form
         new_pop = pop.copy()
@@ -92,7 +92,7 @@ def evolui(modelo, pop, params):
     
     elif modelo == 'SIS':
         
-        indices = [i for i in range(len(pop))]
+        indices = list(range(len(pop)))
         fator_de_transmissao ,fator_de_recuperacao = params[0], params[1]
         p = np.random.permutation(indices)
         ciclos = Permutation(p).cyclic_form
