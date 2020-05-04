@@ -36,10 +36,24 @@ def set_df(fonte, *args):
         df.rename(columns = configs['df']['rename']['rj']['prefeitura'], inplace = True)
         dt_att = df['Data_atualização'].values[0]
         df.drop('Data_atualização', axis = 1, inplace = True)
-        lst_v = [df, dt_att]
         if args and args[0]['df_break'] == True:
             df_break = []
             for s in configs['df']['status']['rj']['prefeitura']:
                 df_break.append(df[df['Evolucao'] == s])
-            lst_v = [df, df_break, dt_att]
-    return lst_v
+            ret_lst = [df, df_break, dt_att]
+        else:
+            ret_lst = [df, dt_att]
+    if fonte == 'estado_rj':
+        df = pd.read_csv(root_dir + '/' + configs['csv']['rj']['file_loc']['estado'])
+        df = df[df['classificacao'] == 'CONFIRMADO']
+        df.rename(columns = configs['df']['rename']['rj']['estado'], inplace = True)
+        for drop in configs['df']['droppable']['rj']['estado']:
+            df.drop(drop, axis = 1, inplace = True)
+        if args and args[0]['df_break'] == True:
+            df_break = []
+            for s in configs['df']['status']['rj']['estado']:
+                df_break.append(df[df['Evolucao'] == s])
+            ret_lst = [df, df_break]
+        else:
+            ret_lst = df
+    return ret_lst

@@ -5,6 +5,7 @@ csv:
       estado:
     file_loc:
       prefeitura: dados/RJ/cidade_rj/dados_covid/Dados_indiv_MRJ_covid19.csv
+      estado:  dados/RJ/estado_rj/dados_covid/ERJ_Casos.csv
 
 df:
   droppable:
@@ -12,22 +13,50 @@ df:
       prefeitura:
         - Data_atualização
       estado:
+        - uf
+        - classificacao
   status:
     rj:
       prefeitura:
         - ativo
         - recuperado
         - óbito
+      estado:
+        - Internado
+        - Recuperado
+        - Óbito
 
   ## As colunas das tabelas de dados seguirão o padrão CamelCase, sem caracteres especiais
   rename:
     rj:
-      prefeitura:
-        classificação_final:  Classificacao
-        dt_notific: Data
-        dt_inicio_sintomas: DataSintomas
-        bairro_resid__estadia: Bairro
-        ap_residencia_estadia: AP
-        sexo: Sexo
-        faixa_etária: FaixaEtaria
-        evolução: Evolucao
+      colunas:
+        prefeitura:
+          classificação_final:  Classificacao
+          dt_notific: Data
+          dt_inicio_sintomas: DataSintomas
+          bairro_resid__estadia: Bairro
+          ap_residencia_estadia: AP
+          sexo: Sexo
+          faixa_etária: FaixaEtaria
+          evolução: Evolucao
+        estado:
+          sexo: Sexo
+          idade: FaixaEtaria
+          municipio_res: Municipio
+          dt_sintoma: DataSintomas
+          dt_coleta_dt_notif : Data
+          evolucao: Evolucao
+          dt_obito: DataObito
+          comorbidades: Comorbidades
+          dias: Dias
+      dados:
+        estado:
+          Evolucao:
+            RECUPERADO: Recuperado
+            recuperado: Recuperado
+            INTERNADO: Internado
+            internado: Internado
+            OBITO: Óbito
+            obito: Óbito
+
+
