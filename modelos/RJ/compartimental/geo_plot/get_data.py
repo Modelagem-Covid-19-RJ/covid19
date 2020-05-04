@@ -13,11 +13,11 @@ def read_data(df, fonte,tipo = 'confirmados'):
                             'ap_residencia_estadia': 'AP Residência',
                                'dt_notific': 'Data', 'evolução': 'Situação atual'}, axis = 1, inplace = True)
         c = df.columns
-        df[[c[1], c[-1]]] = df[[c[-1], c[1]]]
-        df[[c[-2], c[-1]]] = df[[c[-1], c[-2]]]
-        df[[c[2], c[3]]] = df[[c[3], c[2]]]
-        df.rename(mapper = {'Bairro':'Situação atual', 'Situação atual':'Faixa etária',
-                            'Faixa Etaria': 'AP Residência', 'AP Residência': 'Bairro'}, axis = 1, inplace = True)
+        #df[[c[1], c[-1]]] = df[[c[-1], c[1]]]
+        #df[[c[-2], c[-1]]] = df[[c[-1], c[-2]]]
+        #df[[c[2], c[3]]] = df[[c[3], c[2]]]
+        #df.rename(mapper = {'Bairro':'Situação atual', 'Situação atual':'Faixa etária',
+                    #       'Faixa Etaria': 'AP Residência', 'AP Residência': 'Bairro'}, axis = 1, inplace = True)
         df = df.drop(labels = len(df)-1, axis = 0)
     if fonte == 'estado':
         if tipo == 'confirmados':
