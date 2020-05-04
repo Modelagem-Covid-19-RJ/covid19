@@ -12,9 +12,11 @@ df:
     rj:
       prefeitura:
         - Data_atualização
+        - classificação_final
       estado:
         - uf
         - classificacao
+        - dias
   status:
     rj:
       prefeitura:
@@ -31,7 +33,6 @@ df:
     rj:
       colunas:
         prefeitura:
-          classificação_final:  Classificacao
           dt_notific: Data
           dt_inicio_sintomas: DataSintomas
           bairro_resid__estadia: Bairro
@@ -48,7 +49,6 @@ df:
           evolucao: Evolucao
           dt_obito: DataObito
           comorbidades: Comorbidades
-          dias: Dias
       dados:
         estado:
           Evolucao:
@@ -58,5 +58,9 @@ df:
             internado: Internado
             OBITO: Óbito
             obito: Óbito
-
+        prefeitura:
+          Evolucao:
+            ativo: Ativo
+            recuperado: Recuperado
+            óbito: Óbito
 
