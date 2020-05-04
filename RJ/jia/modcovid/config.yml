@@ -1,0 +1,33 @@
+csv:
+  rj:
+    url:
+      prefeitura: monitoramento.subpav.rio/COVID19/dados_abertos/Dados_indiv_MRJ_covid19.csv
+      estado:
+    file_loc:
+      prefeitura: Dados_indiv_MRJ_covid19.csv
+
+df:
+  droppable:
+    rj:
+      prefeitura:
+        - Data_atualização
+      estado:
+  status:
+    rj:
+      prefeitura:
+        - ativo
+        - recuperado
+        - óbito
+
+  ## As colunas das tabelas de dados seguirão o padrão CamelCase, sem caracteres especiais
+  rename:
+    rj:
+      prefeitura:
+        classificação_final:  Classificacao
+        dt_notific: Data
+        dt_inicio_sintomas: DataSintomas
+        bairro_resid__estadia: Bairro
+        ap_residencia_estadia: AP
+        sexo: Sexo
+        faixa_etária: FaixaEtaria
+        evolução: Evolucao

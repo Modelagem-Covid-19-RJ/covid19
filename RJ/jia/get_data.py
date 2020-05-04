@@ -105,7 +105,8 @@ def get_data(local, df, fonte, T_fim, T_start = '29-03-2020', to_print = True):
         acumulado_inicial = n - dados[-1]
         dados = [acumulado_inicial + dado for dado in dados]
         return dados, dados_por_dia
-def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Data', 'Municipio', 'Casos']):
+
+def def_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Data', 'Municipio', 'Casos']):
     if municipios == 'all':
         municipios = set(df['Municipio'])
     else:
@@ -155,6 +156,10 @@ def set_df(df, dt_start, dt_fim, municipios = 'all', skip = False, header = ['Da
 
     return df
 
+
+
+
+################ download_csv ################
 def download_csv(url = 'http://monitoramento.subpav.rio/COVID19/dados_abertos/Dados_indiv_MRJ_covid19.csv', file_dir = 'data_municipios/dados_prefeitura_rio', file_name = 'Dados_indiv_MRJ_covid19', ext = 'csv', add_date = True ):
     import requests
     req = requests.get(url)
