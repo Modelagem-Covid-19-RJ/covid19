@@ -1,6 +1,11 @@
 import pandas as pd
 import yaml
+import git
+import sys
 from modcovid import settings
+
+root_dir = git.Repo('.', search_parent_directories=True).working_tree_dir
+sys.path.insert(1, root_dir)
 
 settings.init()
 
@@ -27,7 +32,7 @@ def set_df(fonte, *args):
     """
 
     if fonte == 'prefeitura_rj':
-        df = pd.read_csv(configs['csv']['rj']['file_loc']['prefeitura'], encoding = 'iso-8859-1', delimiter = ';')
+        df = pd.read_csv(root_dir + '/' + configs['csv']['rj']['file_loc']['prefeitura'], encoding = 'iso-8859-1', delimiter = ';')
         df.rename(columns = configs['df']['rename']['rj']['prefeitura'], inplace = True)
         dt_att = df['Data_atualização'].values[0]
         df.drop('Data_atualização', axis = 1, inplace = True)

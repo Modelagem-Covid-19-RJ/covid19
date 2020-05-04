@@ -4,7 +4,7 @@ csv:
       prefeitura: monitoramento.subpav.rio/COVID19/dados_abertos/Dados_indiv_MRJ_covid19.csv
       estado:
     file_loc:
-      prefeitura: Dados_indiv_MRJ_covid19.csv
+      prefeitura: dados/RJ/cidade_rj/dados_covid/Dados_indiv_MRJ_covid19.csv
 
 df:
   droppable:
