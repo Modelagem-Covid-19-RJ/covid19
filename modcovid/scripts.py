@@ -32,7 +32,7 @@ def set_df(fonte, *args):
     """
 
     if fonte == 'prefeitura_rj':
-        df = pd.read_csv(root_dir + '/' + configs['csv']['rj']['file_loc']['prefeitura'], encoding = 'iso-8859-1', delimiter = ';')
+        df = pd.read_csv(root_dir + '/' + configs['csv']['rj']['file_loc']['prefeitura'], encoding = 'utf-8', delimiter = ';')
         df.rename(columns = configs['df']['rename']['rj']['colunas']['prefeitura'], inplace = True)
         dt_att = df['Data_atualização'].values[0]
         for drop in configs['df']['droppable']['rj']['prefeitura']:
@@ -64,4 +64,26 @@ def set_df(fonte, *args):
     else: 
         print('Fonte de dados Inválida, as opções são prefeitura_rj ou estado_rj')
         ret_lst = 'Error'
+    return ret_lst
+
+################ gen_timeseries ################
+
+def get_timeseries(df, fonte, localidade, T_fim, T_start = '06/03/2020', *args):
+    """Dado um DataFrame organizado por set_df, esta função extrai um timeseries dos dados
+
+    Parameters
+    ----------
+    df : pandas.DataFrame a ser trabalhado
+    fonte : str ('prefeitura_rj', 'estado_rj')
+        Indica qual a fonte dos dados
+
+    *args : dict, optional
+        Um dicionário com argumentos extras:
+            df_break: Se setado para True, muda o retorno para vários DataFrames
+    Returns
+    -------
+    ret_v: Se nenhum argumento opcional for passado, ret_v é uma lista contendo o DataFrame tratado com todos os casos, e a data de atualização dos dados
+            df_break == True: ret_v é uma lista com [DataFrame Tratado, [DataFrame Ativos, DataFrame Recuperados, DataFrame Obitos], Data de Atualização]        
+    """
+    print('a')
     return ret_lst
