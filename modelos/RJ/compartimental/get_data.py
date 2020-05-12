@@ -13,7 +13,7 @@ def read_data(df, fonte,tipo = 'confirmados'):
                             'ap_residencia_estadia': 'AP Residência',
                                'dt_notific': 'Data', 'evolução': 'Situação atual'}, axis = 1, inplace = True)
         c = df.columns
-        print('TESTE')
+        #print('TESTE')
         df[[c[1], c[-1]]] = df[[c[-1], c[1]]]
         df[[c[-2], c[-1]]] = df[[c[-1], c[-2]]]
         df[[c[2], c[3]]] = df[[c[3], c[2]]]
