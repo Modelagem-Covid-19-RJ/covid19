@@ -2,6 +2,7 @@ import pandas as pd
 import yaml
 import git
 import sys
+from functools import reduce
 from modcovid import settings
 
 root_dir = git.Repo('.', search_parent_directories=True).working_tree_dir
@@ -68,7 +69,7 @@ def set_df(fonte, *args):
 
 ################ gen_timeseries ################
 
-def get_timeseries(df, fonte, localidade, T_fim, T_start = '06/03/2020', *args):
+def get_timeseries(df, fonte, T_fim = True, T_start = '06/03/2020', ret_acumul = False, *args):
     """Dado um DataFrame organizado por set_df, esta função extrai um timeseries dos dados
 
     Parameters
@@ -85,5 +86,19 @@ def get_timeseries(df, fonte, localidade, T_fim, T_start = '06/03/2020', *args):
     ret_v: Se nenhum argumento opcional for passado, ret_v é uma lista contendo o DataFrame tratado com todos os casos, e a data de atualização dos dados
             df_break == True: ret_v é uma lista com [DataFrame Tratado, [DataFrame Ativos, DataFrame Recuperados, DataFrame Obitos], Data de Atualização]        
     """
-    print('a')
+    
+    if fonte == 'prefeitura_rj':
+        df = df.groupby(['Data', 'Bairro'])['Bairro'].count()
+        df.name = 'Casos'
+        df = df.reset_index()
+        bairros = list(set(df['Bairro']))
+        dfs = [df[df['Bairro'] == b].drop('Bairro', axis = 1).rename(columns = {'Casos': b}) for b in bairros]
+        ts_df = reduce(lambda x, y: pd.merge(x, y, on = 'Data', how = 'outer'), dfs).fillna(0)
+        ts_df['Data'] = pd.to_datetime(ts_df['Data'], format = '%d/%m/%Y')
+        ts_df = ts_df.sort_values(by = 'Data', ascending = True)
+        ret_lst = ts_df
+        if ret_acumul == True:
+            ts_df_ac = ts_df.iloc[:,1:].cumsum()
+            ts_df_ac.insert(0, 'Data', ts_df['Data'].values)
+            ret_lst = [ts_df, ts_df_ac]
     return ret_lst
