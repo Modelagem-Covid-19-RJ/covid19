@@ -91,7 +91,7 @@ def get_timeseries(df, fonte, T_fim = True, T_start = '06/03/2020', ret_acumul =
         df = df.groupby(['Data', 'Bairro'])['Bairro'].count()
         df.name = 'Casos'
         df = df.reset_index()
-        bairros = list(set(df['Bairro']))
+        bairros = df['Bairro'].unique()
         dfs = [df[df['Bairro'] == b].drop('Bairro', axis = 1).rename(columns = {'Casos': b}) for b in bairros]
         ts_df = reduce(lambda x, y: pd.merge(x, y, on = 'Data', how = 'outer'), dfs).fillna(0)
         ts_df['Data'] = pd.to_datetime(ts_df['Data'], format = '%d/%m/%Y')
