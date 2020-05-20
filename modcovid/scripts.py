@@ -55,6 +55,7 @@ def set_df(fonte, *args):
             df.drop(drop, axis = 1, inplace = True)
         for r in configs['df']['rename']['rj']['dados']['estado']:
             df[r].replace(configs['df']['rename']['rj']['dados']['estado'][r], inplace = True)
+        df['Municipio'] = [m.title()  for m in df['Municipio']]
         if args and args[0]['df_break'] == True:
             df_break = []
             for s in configs['df']['status']['rj']['estado']:
@@ -102,4 +103,21 @@ def get_timeseries(df, fonte, T_fim = True, T_start = '06/03/2020', ret_acumul =
             ts_df_ac = ts_df.iloc[:,1:].cumsum()
             ts_df_ac.insert(0, 'Data', ts_df['Data'].values)
             ret_lst = [ts_df, ts_df_ac]
-    return ret_lst
+        return ret_lst
+
+    if fonte == 'estado_rj':
+        df = df.groupby(['Data', 'Municipio'])['Municipio'].count()
+        df.name = 'Casos'
+        df = df.reset_index()
+        municipios = df['Municipio'].unique()
+        dfs = [df[df['Municipio'] == m].drop('Municipio', axis = 1).rename(columns = {'Casos': m}) for m in municipios]
+        ts_df = reduce(lambda x, y: pd.merge(x, y, on = 'Data', how = 'outer'), dfs).fillna(0)
+        ts_df['Data'] = pd.to_datetime(ts_df['Data'], format = '%Y-%m-%d')
+        ts_df = ts_df.sort_values(by = 'Data', ascending = True)
+        #ts_df['Data'] = ts_df['Data'].dt.strftime('%d/%m/%Y')
+        ret_lst = ts_df
+        if ret_acumul == True:
+            ts_df_ac = ts_df.iloc[:,1:].cumsum()
+            ts_df_ac.insert(0, 'Data', ts_df['Data'].values)
+            ret_lst = [ts_df, ts_df_ac]
+        return ret_lst

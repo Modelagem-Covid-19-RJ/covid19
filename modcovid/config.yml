@@ -5,7 +5,7 @@ csv:
       estado:
     file_loc:
       prefeitura: dados/RJ/cidade_rj/dados_covid/Dados_indiv_MRJ_covid19.csv
-      estado:  dados/RJ/estado_rj/dados_covid/ERJ_Casos.csv
+      estado:  dados/RJ/estado_rj/dados_covid/BICOVIDREAIS_19maio.csv
 
 df:
   droppable:
@@ -58,6 +58,7 @@ df:
             internado: Internado
             OBITO: Óbito
             obito: Óbito
+          Municipio:
         prefeitura:
           Evolucao:
             ativo: Ativo
