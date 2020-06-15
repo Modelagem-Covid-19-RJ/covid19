@@ -478,7 +478,7 @@ class Cenario:
             )
         return X
 
-    def evolui_matricial(self, dados_temporais, num_sim, show=''):
+    def evolui_matricial(self, dados_temporais, num_sim, show='', kappa=False):
         tempos = np.linspace(
             dados_temporais[0],
             dados_temporais[1]*dados_temporais[2],
@@ -522,29 +522,42 @@ class Cenario:
                     G.edges[u, v]['taxa de transmissao'] += \
                         G_aux.edges[u,v]['taxa de transmissao']
 
-        X = individuais.evolucao_matricial(
-                self.pop_estado_0,
-                G,
-                self.gamma, 
-                tempos,
-                num_sim,
-                show)
+        if kappa:
+            X = individuais.evolucao_matricial_kappa(
+                    self.pop_estado_0,
+                    self.tempo_infeccao_0, 
+                    self.duracao_infeccao,
+                    G,
+                    tempos,
+                    num_sim,
+                    show)
+    
+        else:
+            X = individuais.evolucao_matricial(
+                    self.pop_estado_0,
+                    G,
+                    self.gamma, 
+                    tempos,
+                    num_sim,
+                    show)
         return X
 
 class RedeCompleta(Cenario):
-    def __init__(self, num_pop, num_infectados_0, beta, gamma):
+    def __init__(self, num_pop, num_infectados_0, beta, gamma, duracao_infeccao = 11):
         self.nome = 'rede completa'
-        self.define_parametros(num_pop, beta, gamma)
+        self.define_parametros(num_pop, beta, gamma, duracao_infeccao)
         self.inicializa_pop_estado(num_infectados_0)
         self.cria_redes()
+        self.duracao_infeccao = duracao_infeccao
 
-    def define_parametros(self, num_pop, beta, gamma):
+    def define_parametros(self, num_pop, beta, gamma, duracao_infeccao):
         self.num_pop = num_pop
         self.beta = beta
-
         self.beta_r = 0.0
         self.beta_s = beta
         self.beta_c = 0.0
+        
+        self.duracao_infeccao = duracao_infeccao
 
         self.gamma = gamma
 
@@ -571,11 +584,15 @@ class RedeCompleta(Cenario):
         infectados_0 = np.random.choice(self.num_pop,
                                         self.num_infectados_0, 
                                         replace=False)
+        
         #self.pop_estado_0[infectados_0] = \
         #    2*np.ones(num_infectados_0, dtype=np.uint8)
         self.pop_estado_0[infectados_0] = 2*np.ones(self.num_infectados_0)
         self.attr_estado_0 = dict([(i, {'estado': int(self.pop_estado_0[i])}) 
                                    for i in range(self.num_pop)])
+        
+        indexes = np.arange(self.num_pop)[self.pop_estado_0 == 2]
+        self.tempo_infeccao_0 = np.vstack([np.zeros_like(indexes), indexes]).reshape(2,self.num_infectados_0).T
 
     def cria_redes(self):
         """
