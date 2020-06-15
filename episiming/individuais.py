@@ -834,20 +834,15 @@ def evolucao_matricial(pop_0, G, gamma, tempos, num_sim, show=''):
 
 def passo_matricial_kappa(num_pop, populacao, T_prob_nao_infeccao,
                     tempo_infeccao, duracao_infeccao):
-        tempo_infeccao = tempo_infeccao
-        for v in tempo_infeccao:
-            v[0] += 1
-        
+
         pop_novos_recuperados = np.zeros_like(populacao)
         new_temp = [[0,0]]
         for i, v in enumerate(tempo_infeccao):
-            if v[0] < duracao_infeccao:
-#                 tempo_infeccao.remove(v)
-                new_temp = np.concatenate((new_temp, [v]))
+            if v[0] < duracao_infeccao - 1:
+                new_temp = np.concatenate((new_temp, [[v[0] + 1, v[1]]]))
             else:
                 pop_novos_recuperados[v[1]] += 1
 
-    
         # gera uma matriz cheia aleatória (números em [0.0,1.0))
         A_random = np.random.rand(num_pop, num_pop)
         
@@ -1001,7 +996,7 @@ def evolucao_matricial_kappa(pop_0, tempo_infeccao_0, duracao_infeccao, G, tempo
         S = np.array([num_pop - I_0])
         I = np.array([I_0])
         R = np.array([0])
-     
+        tempo_infeccao = tempo_infeccao_0
         
         # evolui o dia e armazena as novas contagens
         for dt in passos_de_tempo:
