@@ -1,0 +1,329 @@
+id_bairros:
+  1: 'Saúde'
+  2: 'Gamboa'
+  3: 'Santo Cristo'
+  4: 'Caju'
+  5: 'Centro'
+  6: 'Catumbi'
+  7: 'Rio Comprido'
+  8: 'Cidade Nova'
+  9: 'Estácio'
+  10: 'São Cristóvão'
+  11: 'Mangueira'
+  12: 'Benfica'
+  13: 'Paquetá'
+  14: 'Santa Teresa'
+  15: 'Flamengo'
+  16: 'Glória'
+  17: 'Laranjeiras'
+  18: 'Catete'
+  19: 'Cosme Velho'
+  20: 'Botafogo'
+  21: 'Humaitá'
+  22: 'Urca'
+  23: 'Leme'
+  24: 'Copacabana'
+  25: 'Ipanema'
+  26: 'Leblon'
+  27: 'Lagoa'
+  28: 'Jardim Botânico'
+  29: 'Gávea'
+  30: 'Vidigal'
+  31: 'São Conrado'
+  32: 'Praça da Bandeira'
+  33: 'Tijuca'
+  34: 'Alto da Boa Vista'
+  35: 'Maracanã'
+  36: 'Vila Isabel'
+  37: 'Andaraí'
+  38: 'Grajaú'
+  39: 'Manguinhos'
+  40: 'Bonsucesso'
+  41: 'Ramos'
+  42: 'Olaria'
+  43: 'Penha'
+  44: 'Penha Circular'
+  45: 'Brás de Pina'
+  46: 'Cordovil'
+  47: 'Parada de Lucas'
+  48: 'Vigário Geral'
+  49: 'Jardim América'
+  50: 'Higienópolis'
+  51: 'Jacaré'
+  52: 'Maria da Graça'
+  53: 'Del Castilho'
+  54: 'Inhaúma'
+  55: 'Engenho da Rainha'
+  56: 'Tomás Coelho'
+  57: 'São Francisco Xavier'
+  58: 'Rocha'
+  59: 'Riachuelo'
+  60: 'Sampaio'
+  61: 'Engenho Novo'
+  62: 'Lins de Vasconcelos'
+  63: 'Méier'
+  64: 'Todos os Santos'
+  65: 'Cachambi'
+  66: 'Engenho de Dentro'
+  67: 'Água Santa'
+  68: 'Encantado'
+  69: 'Piedade'
+  70: 'Abolição'
+  71: 'Pilares'
+  72: 'Vila Kosmos'
+  73: 'Vicente de Carvalho'
+  74: 'Vila da Penha'
+  75: 'Vista Alegre'
+  76: 'Irajá'
+  77: 'Colégio'
+  78: 'Campinho'
+  79: 'Quintino Bocaiúva'
+  80: 'Cavalcanti'
+  81: 'Engenheiro Leal'
+  82: 'Cascadura'
+  83: 'Madureira'
+  84: 'Vaz Lobo'
+  85: 'Turiaçú'
+  86: 'Rocha Miranda'
+  87: 'Honório Gurgel'
+  88: 'Osvaldo Cruz'
+  89: 'Bento Ribeiro'
+  90: 'Marechal Hermes'
+  91: 'Ribeira'
+  92: 'Zumbi'
+  93: 'Cacuia'
+  94: 'Pitangueiras'
+  95: 'Praia da Bandeira'
+  96: 'Cocotá'
+  97: 'Bancários'
+  98: 'Freguesia (Ilha)'
+  99: 'Jardim Guanabara'
+  100: 'Jardim Carioca'
+  101: 'Tauá'
+  102: 'Moneró'
+  103: 'Portuguesa'
+  104: 'Galeão'
+  105: 'Cidade Universitária'
+  106: 'Guadalupe'
+  107: 'Anchieta'
+  108: 'Parque Anchieta'
+  109: 'Ricardo de Albuquerque'
+  110: 'Coelho Neto'
+  111: 'Acari'
+  112: 'Barros Filho'
+  113: 'Costa Barros'
+  114: 'Pavuna'
+  115: 'Jacarepaguá'
+  116: 'Anil'
+  117: 'Gardênia Azul'
+  118: 'Cidade de Deus'
+  119: 'Curicica'
+  120: 'Freguesia (Jacarepaguá)'
+  121: 'Pechincha'
+  122: 'Taquara'
+  123: 'Tanque'
+  124: 'Praça Seca'
+  125: 'Vila Valqueire'
+  126: 'Joá'
+  127: 'Itanhangá'
+  128: 'Barra da Tijuca'
+  129: 'Camorim'
+  130: 'Vargem Pequena'
+  131: 'Vargem Grande'
+  132: 'Recreio dos Bandeirantes'
+  133: 'Grumari'
+  134: 'Deodoro'
+  135: 'Vila Militar'
+  136: 'Campo dos Afonsos'
+  137: 'Jardim Sulacap'
+  138: 'Magalhães Bastos'
+  139: 'Realengo'
+  140: 'Padre Miguel'
+  141: 'Bangu'
+  142: 'Senador Camará'
+  143: 'Santíssimo'
+  144: 'Campo Grande'
+  145: 'Senador Vasconcelos'
+  146: 'Inhoaíba'
+  147: 'Cosmos'
+  148: 'Paciência'
+  149: 'Santa Cruz'
+  150: 'Sepetiba'
+  151: 'Guaratiba'
+  152: 'Barra de Guaratiba'
+  153: 'Pedra de Guaratiba'
+  154: 'Rocinha'
+  155: 'Jacarezinho'
+  156: 'Complexo do Alemão'
+  157: 'Maré'
+  158: 'Vasco da Gama'
+  159: 'Parque Colúmbia'
+  160: 'Gericinó'
+  161: 'Lapa'
+  162: 'Vila Kennedy'
+  163: 'Jabour'
+
+bairros_id:
+  'Saúde': 1
+  'Gamboa': 2
+  'Santo Cristo': 3
+  'Caju': 4
+  'Centro': 5
+  'Catumbi': 6
+  'Rio Comprido': 7
+  'Cidade Nova': 8
+  'Estácio': 9
+  'São Cristóvão': 10
+  'Mangueira': 11
+  'Benfica': 12
+  'Paquetá': 13
+  'Santa Teresa': 14
+  'Flamengo': 15
+  'Glória': 16
+  'Laranjeiras': 17
+  'Catete': 18
+  'Cosme Velho': 19
+  'Botafogo': 20
+  'Humaitá': 21
+  'Urca': 22
+  'Leme': 23
+  'Copacabana': 24
+  'Ipanema': 25
+  'Leblon': 26
+  'Lagoa': 27
+  'Jardim Botânico': 28
+  'Gávea': 29
+  'Vidigal': 30
+  'São Conrado': 31
+  'Praça da Bandeira': 32
+  'Tijuca': 33
+  'Alto da Boa Vista': 34
+  'Maracanã': 35
+  'Vila Isabel': 36
+  'Andaraí': 37
+  'Grajaú': 38
+  'Manguinhos': 39
+  'Bonsucesso': 40
+  'Ramos': 41
+  'Olaria': 42
+  'Penha': 43
+  'Penha Circular': 44
+  'Brás de Pina': 45
+  'Cordovil': 46
+  'Parada de Lucas': 47
+  'Vigário Geral': 48
+  'Jardim América': 49
+  'Higienópolis': 50
+  'Jacaré': 51
+  'Maria da Graça': 52
+  'Del Castilho': 53
+  'Inhaúma': 54
+  'Engenho da Rainha': 55
+  'Tomás Coelho': 56
+  'São Francisco Xavier': 57
+  'Rocha': 58
+  'Riachuelo': 59
+  'Sampaio': 60
+  'Engenho Novo': 61
+  'Lins de Vasconcelos': 62
+  'Méier': 63
+  'Todos os Santos': 64
+  'Cachambi': 65
+  'Engenho de Dentro': 66
+  'Água Santa': 67
+  'Encantado': 68
+  'Piedade': 69
+  'Abolição': 70
+  'Pilares': 71
+  'Vila Kosmos': 72
+  'Vicente de Carvalho': 73
+  'Vila da Penha': 74
+  'Vista Alegre': 75
+  'Irajá': 76
+  'Colégio': 77
+  'Campinho': 78
+  'Quintino Bocaiúva': 79
+  'Cavalcanti': 80
+  'Engenheiro Leal': 81
+  'Cascadura': 82
+  'Madureira': 83
+  'Vaz Lobo': 84
+  'Turiaçú': 85
+  'Rocha Miranda': 86
+  'Honório Gurgel': 87
+  'Osvaldo Cruz': 88
+  'Bento Ribeiro': 89
+  'Marechal Hermes': 90
+  'Ribeira': 91
+  'Zumbi': 92
+  'Cacuia': 93
+  'Pitangueiras': 94
+  'Praia da Bandeira': 95
+  'Cocotá': 96
+  'Bancários': 97
+  'Freguesia (Ilha)': 98
+  'Jardim Guanabara': 99
+  'Jardim Carioca': 100
+  'Tauá': 101
+  'Moneró': 102
+  'Portuguesa': 103
+  'Galeão': 104
+  'Cidade Universitária': 105
+  'Guadalupe': 106
+  'Anchieta': 107
+  'Parque Anchieta': 108
+  'Ricardo de Albuquerque': 109
+  'Coelho Neto': 110
+  'Acari': 111
+  'Barros Filho': 112
+  'Costa Barros': 113
+  'Pavuna': 114
+  'Jacarepaguá': 115
+  'Anil': 116
+  'Gardênia Azul': 117
+  'Cidade de Deus': 118
+  'Curicica': 119
+  'Freguesia (Jacarepaguá)': 120
+  'Pechincha': 121
+  'Taquara': 122
+  'Tanque': 123
+  'Praça Seca': 124
+  'Vila Valqueire': 125
+  'Joá': 126
+  'Itanhangá': 127
+  'Barra da Tijuca': 128
+  'Camorim': 129
+  'Vargem Pequena': 130
+  'Vargem Grande': 131
+  'Recreio dos Bandeirantes': 132
+  'Grumari': 133
+  'Deodoro': 134
+  'Vila Militar': 135
+  'Campo dos Afonsos': 136
+  'Jardim Sulacap': 137
+  'Magalhães Bastos': 138
+  'Realengo': 139
+  'Padre Miguel': 140
+  'Bangu': 141
+  'Senador Camará': 142
+  'Santíssimo': 143
+  'Campo Grande': 144
+  'Senador Vasconcelos': 145
+  'Inhoaíba': 146
+  'Cosmos': 147
+  'Paciência': 148
+  'Santa Cruz': 149
+  'Sepetiba': 150
+  'Guaratiba': 151
+  'Barra de Guaratiba': 152
+  'Pedra de Guaratiba': 153
+  'Rocinha': 154
+  'Jacarezinho': 155
+  'Complexo do Alemão': 156
+  'Maré': 157
+  'Vasco da Gama': 158
+  'Parque Colúmbia': 159
+  'Gericinó': 160
+  'Lapa': 161
+  'Vila Kennedy': 162
+  'Jabour': 163
