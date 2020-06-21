@@ -609,29 +609,30 @@ def passo_matricial(num_pop, populacao, T_prob_nao_infeccao,
         
         # filtra a matriz aleatória mantendo apenas os contatos entre um suscetível e um infectado
         A_contatos = np.multiply(np.tile(pop_suscetiveis, (num_pop, 1)).transpose(), A_risco_random)
-        
+
         # cria uma matriz de 1's e 0's, indicando se houve, ou não, contágio
         A_infectados = np.select([A_contatos > T_prob_nao_infeccao], [np.ones([num_pop, num_pop])])
-
+        
         # obtém novos infectados
         pop_novos_infectados = np.select([np.sum(A_infectados, axis=1)>0], [np.ones(num_pop)])
         
-        # filtra matriz aleatória com a diagonal
-        pop_recuperando = pop_infectados @ np.multiply(np.eye(num_pop), A_random)
+        # # filtra matriz aleatória com a diagonal
+        # pop_recuperando = pop_infectados @ np.multiply(np.eye(num_pop), A_random)
         
-        # obtém novos recuperados
-        pop_novos_recuperados = np.select([pop_recuperando > prob_nao_recuperacao], [np.ones(num_pop)])
+        # # obtém novos recuperados
+        # pop_novos_recuperados = np.select([pop_recuperando > prob_nao_recuperacao], [np.ones(num_pop)])
         
-        # atualiza população adicionando um aos que avançaram de estágio
-        populacao_nova = populacao + pop_novos_infectados + pop_novos_recuperados
-
+        # # atualiza população adicionando um aos que avançaram de estágio
+        # populacao_nova = populacao + pop_novos_infectados + pop_novos_recuperados
+        populacao_nova = populacao + pop_novos_infectados
+                    
         # Observe que cada elemento da matriz aleatória é usado apenas uma vez, garantindo
         # a independência desses eventos aleatórios (tanto quanto se leve em consideração
         # que os números gerados são pseudo-aleatórios)
 
         return populacao_nova
 
-def evolucao_matricial(pop_0, G, gamma, tempos, num_sim, show=''):
+def evolucao_matricial(pop_0, G, gamma, kappa, infectados_contador_0, tempos, num_sim, show=''):
     """Evolução temporal da epidemia em um grafo estruturado.
 
 
@@ -742,20 +743,21 @@ def evolucao_matricial(pop_0, G, gamma, tempos, num_sim, show=''):
         S = np.array([num_pop - I_0])
         I = np.array([I_0])
         R = np.array([0])
-     
-        
+        infectados_contador = np.copy(infectados_contador_0)
         # evolui o dia e armazena as novas contagens
         for dt in passos_de_tempo:
-
+            A_contador = np.tile(infectados_contador, [num_pop, 1])
             # calcula probabilidades
-            T_prob_nao_infeccao = np.exp(-dt*T_adj)
+            T_prob_nao_infeccao = np.exp(-dt * np.multiply(T_adj, kappa(A_contador))) 
             prob_nao_recuperacao = np.exp(-gamma*dt)
-
             populacao = passo_matricial(num_pop, populacao,
                                                 T_prob_nao_infeccao, prob_nao_recuperacao)
+            a = np.logical_and(infectados_contador > 10, kappa(infectados_contador) == 0)
+            populacao[a] = 3
             S = np.hstack([S, np.count_nonzero(populacao==1)])
             I = np.hstack([I, np.count_nonzero(populacao==2)])
             R = np.hstack([R, np.count_nonzero(populacao==3)])
+            infectados_contador[populacao==2] += dt
             
         # adiciona as contagens dessa simulação para o cálculo final da média
         S_medio += S

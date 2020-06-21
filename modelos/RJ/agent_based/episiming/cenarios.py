@@ -17,6 +17,11 @@ import networkx as nx
 
 from episiming import redes, individuais, rede_escolar
 
+def kappa_padrao(t, periodo_incubacao = 5, periodo_infeccao = 11):
+    b = (t < periodo_infeccao + periodo_infeccao)
+    c = (t > periodo_incubacao)
+    return np.logical_and(b,c).astype(int)
+
 def power_decay(a, b, x):
     return 1.0/(1.0 + (x/a)**b)
 
@@ -491,11 +496,13 @@ def gera_empresas(pop_por_bloco, pop_idades, pop_blocos_indices,
     return emp_bloco_pos, emp_por_bloco, emp_tam, emp_membros
 
 class Cenario:
-    def __init__(self, num_pop, num_infectados_0, beta, gamma):
+    def __init__(self, num_pop, num_infectados_0, beta, gamma, kappa = kappa_padrao):
         self.nome = 'Base'
         self.define_parametros()
         self.cria_redes()
         self.inicializa_pop_estado()
+        self.kappa = kappa
+        self.infectados_contador = np.zeros(self.num_pop)
 
     def define_parametros(self):
         self.num_pop = 1
@@ -504,6 +511,7 @@ class Cenario:
         self.attr_pos = {0: [0.0, 0.0]}
         self.pop_posicoes = np.array([[0.0, 0.0]])
         self.f_kernel = partial(power_decay, 1.0, 1.0)
+        # quando estiver pronto definir o kappa aqui
 
     def cria_redes(self):
         """
@@ -606,18 +614,22 @@ class Cenario:
         X = individuais.evolucao_matricial(
                 self.pop_estado_0,
                 G,
-                self.gamma, 
+                self.gamma,
+                self.kappa,
+                self.infectados_contador, 
                 tempos,
                 num_sim,
                 show)
         return X
 
 class RedeCompleta(Cenario):
-    def __init__(self, num_pop, num_infectados_0, beta, gamma):
+    def __init__(self, num_pop, num_infectados_0, beta, gamma, kappa = kappa_padrao):
         self.nome = 'rede completa'
         self.define_parametros(num_pop, beta, gamma)
         self.inicializa_pop_estado(num_infectados_0)
         self.cria_redes()
+        self.kappa = kappa
+        self.infectados_contador = np.zeros(self.num_pop)
 
     def define_parametros(self, num_pop, beta, gamma):
         self.num_pop = num_pop
@@ -632,6 +644,7 @@ class RedeCompleta(Cenario):
         self.pop_rho = np.ones(num_pop)
 
         self.f_kernel = partial(power_decay, 1.0, 1.5)
+        # quando a função estiver certa, definir infectados_contador aqui
 
         self.attr_pos = dict()
         k = 0
