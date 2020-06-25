@@ -1,0 +1,83 @@
+csv:
+  rj:
+    url:
+      prefeitura: monitoramento.subpav.rio/COVID19/dados_abertos/Dados_indiv_MRJ_covid19.csv
+      estado:
+    file_loc:
+      prefeitura: dados/RJ/cidade_rj/dados_covid/Dados_indiv_MRJ_covid19.csv
+      estado:  dados/RJ/estado_rj/dados_covid/BICOVIDREAIS_19maio.csv
+
+df:
+  droppable:
+    rj:
+      prefeitura:
+        - Data_atualização
+        - classificação_final
+      estado:
+        - uf
+        - classificacao
+        - dias
+  status:
+    rj:
+      prefeitura:
+        - Ativo
+        - Recuperado
+        - Óbito
+      estado:
+        - Internado
+        - Recuperado
+        - Óbito
+
+  ## As colunas das tabelas de dados seguirão o padrão CamelCase, sem caracteres especiais
+  rename:
+    rj:
+      colunas:
+        prefeitura:
+          dt_notific: Data
+          dt_inicio_sintomas: DataSintomas
+          bairro_resid__estadia: Bairro
+          ap_residencia_estadia: AP
+          sexo: Sexo
+          faixa_etária: FaixaEtaria
+          evolução: Evolucao
+        estado:
+          sexo: Sexo
+          idade: FaixaEtaria
+          municipio_res: Municipio
+          dt_sintoma: DataSintomas
+          dt_coleta_dt_notif : Data
+          evolucao: Evolucao
+          dt_obito: DataObito
+          comorbidades: Comorbidades
+      dados:
+        estado:
+          Evolucao:
+            RECUPERADO: Recuperado
+            recuperado: Recuperado
+            INTERNADO: Internado
+            internado: Internado
+            OBITO: Óbito
+            obito: Óbito
+          Municipio:
+        prefeitura:
+          Evolucao:
+            ativo: Ativo
+            recuperado: Recuperado
+            óbito: Óbito
+          AP:
+            #N/D: N/D
+            Complexo da Mare: Mare
+          FaixaEtaria:
+            aaDe 0 a 9: De 0 a 9
+            bbDe 10 a 19: De 10 a 19
+            ccDe 20 a 29: De 20 a 29
+            ddDe 30 a 39: De 30 a 39
+            eeDe 40 a 49: De 40 a 49
+            ffDe 50 a 59: De 50 a 59
+            ggDe 60 a 69: De 60 a 69
+            hhDe 70 a 79: De 70 a 79
+            iiDe 80 a 89: De 80 a 89
+            jjDe 90 a 100: De 90 a 100
+            kkDe 100 a 109: De 100 a 109
+            llDe 110 a 119: De 110 a 119
+            zzN/D: N/D
