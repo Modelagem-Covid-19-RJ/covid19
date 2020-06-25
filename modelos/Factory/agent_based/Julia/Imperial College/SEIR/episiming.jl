@@ -75,13 +75,24 @@ function rowWiseNorm(A)
     return sqrt.(sum(abs2, A, dims=2)[:, 1])
 end
 
-function escreveDistancias(populacao, rodada, fKernel; T=Float16)
+function calculaDistanciaFina(populacao::Populacao, bairro::Bairro, suscetiveisBairro, infectadosBairro, fKernel; T=Float16)
+    """
+        Cálculo da distancia entre as pessoas de um mesmo bairro
+    """
+    aux = zeros(T, length(suscetiveisBairro), length(infectadosBairro))
+    for i in 1:length(suscetiveisBairro)
+        aux[i, :] += fKernel(populacao.posicoes[infectadosBairro, :] .- populacao.posicoes[suscetiveisBairro[i], :]')
+    end
+    return aux
+end
+
+function escreveDistancias(populacao, fKernel; T=Float16)
     """
         Calcula e escreve a matriz de distancias entre pessoas do mesmo bairro, para todos os bairros
     """
-    rm(joinpath("saidas", string(rodada)), recursive=true, force=true)
-    mkdir(joinpath("saidas", string(rodada)))
-    dir = joinpath("saidas", string(rodada), "dist")
+    rm(joinpath("saidas", string(populacao.rodada)), recursive=true, force=true)
+    mkdir(joinpath("saidas", string(populacao.rodada)))
+    dir = joinpath("saidas", string(populacao.rodada), "dist")
     mkdir(dir)
     for i in 1:length(populacao.bairros)
         bairro = populacao.bairros[i]
@@ -106,34 +117,26 @@ function abreEps(rodada, i, T=Float16)
     return reshape(aux, (n, n))
 end
 
-function leDistancia(populacao::Populacao, suscetiveis, infectados, fKernel)
+function leDistancia(populacao::Populacao, diaContagio, cargaViral, t, suscetiveis, infectados)
     """
         Calcula soma das distancias entre os infectados e os suscetiveis, 
         tomando a distancia media entre pessoas de bairros diferentes e lendo a matriz de distancias
         para pessoas do mesmo bairro.
     """
     aux = zeros(populacao.n)
-    infectadosBairros = [sum(infectados[i.pessoas]) for i in populacao.bairros]
-    Threads.@threads for i in 1:length(populacao.bairros)
-        bairro = populacao.bairros[i]
-        suscetiveisBairro = suscetiveis[bairro.pessoas]
-        infectadosBairro = infectados[bairro.pessoas]
-        aux[bairro.pessoas[suscetiveisBairro]] .+= sum(infectadosBairros .* bairro.distancias)
-        aux[bairro.pessoas[suscetiveisBairro]] .+= sum(abreEps(populacao.rodada, i)[suscetiveisBairro, infectadosBairro], dims=2)[:, 1]
+    infectadosBairros = [sum(populacao.ρ[i.pessoas[infectados[i.pessoas]]] .* cargaViral(diaContagio[i.pessoas[infectados[i.pessoas]]], t)) for i in populacao.bairros]
+    for bairro in populacao.bairros
+        suscetiveisBairro = bairro.pessoas[suscetiveis[bairro.pessoas]]
+        infectadosBairro = bairro.pessoas[infectados[bairro.pessoas]]
+        contatosBairro .+= abreEps(populacao.rodada, i)[suscetiveisBairro, infectadosBairro]
+        contatosBairro .*= (populacao.ρ[infectadosBairro] .* cargaViral(diaContagio[infectadosBairro], t))'
+        aux[suscetiveisBairro] .+= sum(infectadosBairros .* bairro.distancias)
+        aux[suscetiveisBairro] .+= sum(contatosBairro, dims=2)[:, 1]
     end
     return aux[suscetiveis]
 end
 
-function calculaDistanciaFina(populacao::Populacao, bairro::Bairro, suscetiveisBairro, infectadosBairro, fKernel; T=Float16)
-    """
-        Cálculo da distancia entre as pessoas de um mesmo bairro
-    """
-    aux = zeros(T, length(suscetiveisBairro), length(infectadosBairro))
-    Threads.@threads for i in 1:length(suscetiveisBairro)
-        aux[i, :] += fKernel(populacao.posicoes[infectadosBairro, :] .- populacao.posicoes[suscetiveisBairro[i], :]')
-    end
-    return aux
-end
+leDistancia(populacao::Populacao) = leDistancia(populacao, zeros(populacao.n), (x, t) -> 1, 1, ones(Bool, populacao.n), ones(Bool, populacao.n))
 
 function calculaDistancia(populacao::Populacao, diaContagio, cargaViral, t, suscetiveis, infectados, fKernel)
     """
@@ -183,7 +186,8 @@ function passoMisto(populacao::Populacao, estadoAtual::Array{T} where T <: Numbe
         contatos[popSuscetiveis] .+= calculaDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popInfectados, parametros.fKernel) .* parametros.θᵢ(t)[popSuscetiveis]
         contatos[popSuscetiveis] .+= calculaDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popAssintomaticos, parametros.fKernel) .* parametros.θₐ(t)[popSuscetiveis]
     else
-        contatos[popSuscetiveis] .+= leDistancia(populacao, popSuscetiveis, popInfectados, fKernel) .* θᵤ(t)[popSuscetiveis]
+        contatos[popSuscetiveis] .+= leDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popInfectados) .* parametros.θᵢ(t)[popSuscetiveis]
+        contatos[popSuscetiveis] .+= leDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popAssintomaticos) .* parametros.θₐ(t)[popSuscetiveis]
     end
 
     probExposicao = exp.(- δ .* contatos)
@@ -194,7 +198,7 @@ function passoMisto(populacao::Populacao, estadoAtual::Array{T} where T <: Numbe
     novosRecuperados = (selectiveRand(popInfectados) + selectiveRand(popAssintomaticos)) .> exp(- parametros.γ .* δ)
     transicoes[novosRecuperados, 3] .= t
 
-    fimIncubacao = selectiveRand(popExpostos) .< parametros.probFimIncubacao
+    fimIncubacao = selectiveRand(popExpostos) .> (1 - parametros.probFimIncubacao)
     transicoes[fimIncubacao, 2] .= t
     novosInfectados = selectiveRand(fimIncubacao) .> parametros.probAssintomatico
     novosAssintomaticos = fimIncubacao .& (.~novosInfectados)
@@ -333,14 +337,14 @@ function geraRedeResidencial(dadosPessoas, geradorResidencias, geradorθᵢ, ger
     ]
     
     pop0 = ones(Int, nPessoas)
-    pop0[StatsBase.sample(1:nPessoas, I0, replace=false)] .= 2;
+    pop0[StatsBase.sample(1:nPessoas, I0, replace=false)] .= 4;
     
     if writeDisk
         rodada = length(readdir("saidas")) + 1
-        populacao = Populacao(rodada, nPessoas, I0, pop0, -1 * ones(Int, nPessoas), posicoes, redes, listaBairros)
+        populacao = Populacao(rodada, nPessoas, I0, pop0, -1 * ones(Int, nPessoas), ones(nPessoas), posicoes, redes, listaBairros)
         
         # escreve matriz de distancias das pessoas de cada bairro
-        escreveDistancias(populacao, rodada, fKernel)
+        escreveDistancias(populacao, fKernel)
         return populacao
     else
         return Populacao(-1, nPessoas, I0, pop0, -1 * ones(Int, nPessoas), ones(nPessoas), posicoes, redes, listaBairros)
