@@ -616,7 +616,7 @@ def passo_matricial(num_pop, populacao, T_prob_nao_infeccao,
         # obtém novos infectados
         pop_novos_infectados = np.select([np.sum(A_infectados, axis=1)>0], [np.ones(num_pop)])
         
-        # # filtra matriz aleatória com a diagonal
+        # # # filtra matriz aleatória com a diagonal
         # pop_recuperando = pop_infectados @ np.multiply(np.eye(num_pop), A_random)
         
         # # obtém novos recuperados
@@ -744,6 +744,7 @@ def evolucao_matricial(pop_0, G, gamma, kappa, infectados_contador_0, tempos, nu
         I = np.array([I_0])
         R = np.array([0])
         infectados_contador = np.copy(infectados_contador_0)
+        tempo_decorrido = 0
         # evolui o dia e armazena as novas contagens
         for dt in passos_de_tempo:
             A_contador = np.tile(infectados_contador, [num_pop, 1])
@@ -752,13 +753,13 @@ def evolucao_matricial(pop_0, G, gamma, kappa, infectados_contador_0, tempos, nu
             prob_nao_recuperacao = np.exp(-gamma*dt)
             populacao = passo_matricial(num_pop, populacao,
                                                 T_prob_nao_infeccao, prob_nao_recuperacao)
-            a = np.logical_and(infectados_contador > 10, kappa(infectados_contador) == 0)
-            populacao[a] = 3
+            # a = np.logical_and(infectados_contador > 10, kappa(infectados_contador) == 0)
+            populacao[infectados_contador > 11] = 3
             S = np.hstack([S, np.count_nonzero(populacao==1)])
             I = np.hstack([I, np.count_nonzero(populacao==2)])
             R = np.hstack([R, np.count_nonzero(populacao==3)])
             infectados_contador[populacao==2] += dt
-            
+            tempo_decorrido += dt
         # adiciona as contagens dessa simulação para o cálculo final da média
         S_medio += S
         I_medio += I

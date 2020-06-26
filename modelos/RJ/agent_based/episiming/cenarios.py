@@ -22,6 +22,12 @@ def kappa_padrao(t, periodo_incubacao = 5, periodo_infeccao = 11):
     c = (t > periodo_incubacao)
     return np.logical_and(b,c).astype(int)
 
+
+# a = 1 shape, k
+# lamb = -2 scale
+def w(x, a = 1, lamb = -2):
+    return np.floor((a/lamb) * (x/lamb) ** (a-1) * np.exp((-x/lamb) ** a))
+
 def power_decay(a, b, x):
     return 1.0/(1.0 + (x/a)**b)
 
@@ -502,7 +508,7 @@ class Cenario:
         self.cria_redes()
         self.inicializa_pop_estado()
         self.kappa = kappa
-        self.infectados_contador = np.zeros(self.num_pop)
+        # self.infectados_contador = np.zeros(self.num_pop)
 
     def define_parametros(self):
         self.num_pop = 1
@@ -629,8 +635,6 @@ class RedeCompleta(Cenario):
         self.inicializa_pop_estado(num_infectados_0)
         self.cria_redes()
         self.kappa = kappa
-        self.infectados_contador = np.zeros(self.num_pop)
-
     def define_parametros(self, num_pop, beta, gamma):
         self.num_pop = num_pop
         self.beta = beta
@@ -645,7 +649,6 @@ class RedeCompleta(Cenario):
 
         self.f_kernel = partial(power_decay, 1.0, 1.5)
         # quando a função estiver certa, definir infectados_contador aqui
-
         self.attr_pos = dict()
         k = 0
         for i in range(self.num_pop):
@@ -670,6 +673,9 @@ class RedeCompleta(Cenario):
         self.pop_estado_0[infectados_0] = 2*np.ones(self.num_infectados_0)
         self.attr_estado_0 = dict([(i, {'estado': int(self.pop_estado_0[i])}) 
                                    for i in range(self.num_pop)])
+        self.infectados_contador = np.zeros(self.num_pop)
+        self.infectados_contador[infectados_0] = -w(4 * np.random.rand(len(infectados_0))).astype(int)
+        # infectados_contador[infectados_0] = w()
 
     def cria_redes(self):
         """
