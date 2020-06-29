@@ -3,11 +3,24 @@ import random
 
 import networkx as nx
 
+# fracoes_grupos_2 = array([0.14666667, 0.40888889, 0.        , 0.        , 0.        ])
+# fracoes_grupos_3 = array([0.        , 0.        , 0.25569862, 0.        , 0.        ])
+# fracoes_grupos_5 = array([0.        , 0.        , 0.        , 0.23945578, 0.        ])
+# fracoes_grupos_6 = array([0.14346756, 0.39997017, 0.45939074, 0.        , 0.        ])
+# fracoes_grupos_7 = array([0.        , 0.        , 0.        , 0.        , 0.00673317])
+# fracoes_grupos_15 = array([0.        , 0.        , 0.07249391, 0.16689342, 0.        ])
+# fracoes_grupos_21 = array([0.        , 0.        , 0.04097482, 0.        , 0.01296758])
+# fracoes_grupos_30 = array([0.0303915 , 0.08472782, 0.09731519, 0.22403628, 0.        ])
+# fracoes_grupos_35 = array([0.        , 0.        , 0.        , 0.11882086, 0.01633416])
+# fracoes_grupos_42 = array([0.00689038, 0.01920955, 0.02206336, 0.        , 0.00698254])
+# fracoes_grupos_105 = array([0.        , 0.        , 0.0137896 , 0.03174603, 0.00436409])
+# fracoes_grupos_210 = array([0.00258389, 0.00720358, 0.00827376, 0.01904762, 0.00261845])
+
 def distribuicao_idade(num_pop, censo_residencial, res_individuos, pop_idades, piramide_etaria, idades_grupos, idades_fracoes_grupos, idade_max):
     num_pop_0a19 = int(num_pop*np.sum(idades_fracoes_grupos[0:20]))
 
-    p_esc_a_idades_grupos = np.array([0, 2, 3, 6, 11, 15, 17, 19, 20, 100])
-    p_esc_a_idades_fracoes_grupos = np.array([0, .4, .8, .95, .95, .95, .95, .75, 0])
+    p_esc_a_idades_grupos = np.array([0, 4, 6, 15, 20, 100])
+    p_esc_a_idades_fracoes_grupos = np.array([.33, .92, .97, .80, 0.05])
     num_tam_res = len(censo_residencial)
     distrib_tam_por_res = np.array([len(res_individuos[k]) for k in range(len(res_individuos))])
     distrib_res = np.array([len(distrib_tam_por_res[distrib_tam_por_res == j]) for j in range(1,num_tam_res+1)])
@@ -18,7 +31,7 @@ def distribuicao_idade(num_pop, censo_residencial, res_individuos, pop_idades, p
 
     p_esc_a_idades_fracoes = np.array(p_esc_a_idades_fracoes)
 
-    num_ativos_escola = int(p_esc_a_idades_fracoes.sum()/100 * num_pop)
+    num_ativos_escola = int(p_esc_a_idades_fracoes.sum()/100 * num_pop) # adicionar a taxa de redução como propriedade do obj
 
     pessoas_por_idade = list()
 
