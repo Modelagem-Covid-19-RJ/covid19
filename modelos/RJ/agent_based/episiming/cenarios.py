@@ -27,6 +27,7 @@ def kappa_padrao(t, periodo_incubacao = 5, periodo_infeccao = 11):
 # lamb = -2 scale
 def w(x, a = 1, lamb = -2):
     return np.floor((a/lamb) * (x/lamb) ** (a-1) * np.exp((-x/lamb) ** a))
+abc = 4
 
 def power_decay(a, b, x):
     return 1.0/(1.0 + (x/a)**b)
@@ -674,7 +675,7 @@ class RedeCompleta(Cenario):
         self.attr_estado_0 = dict([(i, {'estado': int(self.pop_estado_0[i])}) 
                                    for i in range(self.num_pop)])
         self.infectados_contador = np.zeros(self.num_pop)
-        self.infectados_contador[infectados_0] = -w(4 * np.random.rand(len(infectados_0))).astype(int)
+        self.infectados_contador[infectados_0] = -w(abc * np.random.rand(len(infectados_0))).astype(int)
         # infectados_contador[infectados_0] = w()
 
     def cria_redes(self):

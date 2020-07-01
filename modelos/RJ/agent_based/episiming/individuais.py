@@ -22,6 +22,8 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+bernoulli = False
+
 def passo_vetorial(pop_estado, redes, redes_tx_transmissao,
                    pop_fator_tx_transmissao_c, prob_nao_recuperacao,
                    pop_posicoes, f_kernel, dt):
@@ -616,15 +618,18 @@ def passo_matricial(num_pop, populacao, T_prob_nao_infeccao,
         # obtém novos infectados
         pop_novos_infectados = np.select([np.sum(A_infectados, axis=1)>0], [np.ones(num_pop)])
         
-        # # # filtra matriz aleatória com a diagonal
-        # pop_recuperando = pop_infectados @ np.multiply(np.eye(num_pop), A_random)
+        if bernoulli:
+            # filtra matriz aleatória com a diagonal
+            pop_recuperando = pop_infectados @ np.multiply(np.eye(num_pop), A_random)
+            
+            # obtém novos recuperados
+            pop_novos_recuperados = np.select([pop_recuperando > prob_nao_recuperacao], [np.ones(num_pop)])
+            
+            # atualiza população adicionando um aos que avançaram de estágio
+            populacao_nova = populacao + pop_novos_infectados + pop_novos_recuperados
         
-        # # obtém novos recuperados
-        # pop_novos_recuperados = np.select([pop_recuperando > prob_nao_recuperacao], [np.ones(num_pop)])
-        
-        # # atualiza população adicionando um aos que avançaram de estágio
-        # populacao_nova = populacao + pop_novos_infectados + pop_novos_recuperados
-        populacao_nova = populacao + pop_novos_infectados
+        else:
+            populacao_nova = populacao + pop_novos_infectados
                     
         # Observe que cada elemento da matriz aleatória é usado apenas uma vez, garantindo
         # a independência desses eventos aleatórios (tanto quanto se leve em consideração
