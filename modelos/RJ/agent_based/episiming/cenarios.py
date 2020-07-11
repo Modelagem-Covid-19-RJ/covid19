@@ -17,6 +17,16 @@ import networkx as nx
 
 from episiming import redes, individuais, rede_escolar
 
+import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import matplotlib.colors as c
+
+def color_to_rgba(cor, alpha):
+    cor_rgba = tuple(np.array(c.to_rgba(cor, alpha = alpha/255))*255)
+    return 'rgba'+ str(cor_rgba)
+
 def kappa_padrao(t, periodo_incubacao = 5, periodo_infeccao = 11):
     b = (t < periodo_infeccao + periodo_infeccao)
     c = (t > periodo_incubacao)
@@ -574,7 +584,7 @@ class Cenario:
             )
         return X
 
-    def evolui_matricial(self, dados_temporais, num_sim, show=''):
+    def evolui_matricial(self, dados_temporais, num_sim, jia = False, show=''):
         tempos = np.linspace(
             dados_temporais[0],
             dados_temporais[1]*dados_temporais[2],
@@ -617,16 +627,27 @@ class Cenario:
                 if (u, v) in G_aux.edges:
                     G.edges[u, v]['taxa de transmissao'] += \
                         G_aux.edges[u,v]['taxa de transmissao']
-
-        X = individuais.evolucao_matricial(
-                self.pop_estado_0,
-                G,
-                self.gamma,
-                self.kappa,
-                self.infectados_contador, 
-                tempos,
-                num_sim,
-                show)
+                    
+        if jia:
+             X = individuais.evolucao_grafo_estruturado(
+                    self.pop_estado_0,
+                    *jia,
+                    G,
+                    tempos,
+                    num_sim,
+                    show)
+        
+        else:
+            X = individuais.evolucao_matricial(
+                    self.pop_estado_0,
+                    G,
+                    self.gamma,
+                    self.kappa,
+                    self.infectados_contador, 
+                    tempos,
+                    num_sim,
+                    show)
+        
         return X
 
 class RedeCompleta(Cenario):
