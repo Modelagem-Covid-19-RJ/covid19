@@ -2,7 +2,7 @@ using StatsBase
 
 abstract type Parametros end
 
-mutable struct SEAIR <: Parametros
+mutable struct SEIR <: Parametros
     fKernel
     γ::Number
     probFimIncubacao::Number
@@ -144,21 +144,40 @@ function calculaDistancia(populacao::Populacao, diaContagio, cargaViral, t, susc
     """
     aux = zeros(populacao.n)
     infectadosBairros = [sum(populacao.ρ[i.pessoas[infectados[i.pessoas]]] .* cargaViral(diaContagio[i.pessoas[infectados[i.pessoas]]], t)) for i in populacao.bairros]
-    for bairro in populacao.bairros
+    indices = 1:length(populacao.bairros)
+    for (i, bairro) in enumerate(populacao.bairros)
         suscetiveisBairro = bairro.pessoas[suscetiveis[bairro.pessoas]]
         infectadosBairro = bairro.pessoas[infectados[bairro.pessoas]]
-        contatosBairro = calculaDistanciaFina(populacao, bairro, suscetiveisBairro, infectadosBairro, fKernel)
-        contatosBairro .*= (populacao.ρ[infectadosBairro] .* cargaViral(diaContagio[infectadosBairro], t))'
-        aux[suscetiveisBairro] .+= sum(infectadosBairros .* bairro.distancias)
-        aux[suscetiveisBairro] .+= sum(contatosBairro, dims=2)[:, 1]
+
+        aux[suscetiveisBairro] .+= sum(infectadosBairros .* bairro.distancias .* (indices .!= i))
+        
+        taxas = (populacao.ρ[infectadosBairro] .* cargaViral(diaContagio[infectadosBairro], t))'
+        for j in suscetiveisBairro
+            aux[j] += sum(fKernel(populacao.posicoes[infectadosBairro, :] .- populacao.posicoes[j, :]') .* taxas)
+        end
     end
     return aux[suscetiveis]
 end
 
+function calculaDistancia(populacao::Populacao, diaContagio, cargaViral, t, suscetiveis, infectados, fKernel, dist)
+    if dist
+        return calculaDistancia(populacao, diaContagio, cargaViral, t, suscetiveis, infectados, fKernel)
+    else
+        aux = zeros(populacao.n)
+        infectadosBairros = [sum(populacao.ρ[i.pessoas[infectados[i.pessoas]]] .* cargaViral(diaContagio[i.pessoas[infectados[i.pessoas]]], t)) for i in populacao.bairros]
+        for bairro in populacao.bairros
+            suscetiveisBairro = bairro.pessoas[suscetiveis[bairro.pessoas]]
+            aux[suscetiveisBairro] .+= sum(infectadosBairros .* bairro.distancias)
+        end
+        return aux[suscetiveis]
+    end
+end
+
 calculaDistancia(populacao::Populacao, suscetiveis, infectados, fKernel) = calculaDistancia(populacao, zeros(populacao.n), (x, t) -> 1, 1, suscetiveis, infectados, fKernel)
 calculaDistancia(populacao::Populacao, fKernel) = calculaDistancia(populacao, zeros(populacao.n), (x, t) -> 1, 1, ones(Bool, populacao.n), ones(Bool, populacao.n), fKernel)
+calculaDistancia(populacao::Populacao, fKernel, dist) = calculaDistancia(populacao, zeros(populacao.n), (x, t) -> 1, 1, ones(Bool, populacao.n), ones(Bool, populacao.n), fKernel, dist)
 
-function passoMisto(populacao::Populacao, estadoAtual::Array{T} where T <: Number, t::Number, δ::Number, transicoes::Array{T, 2} where T <: Integer, parametros::Parametros)
+function passoMisto(populacao::Populacao, estadoAtual::Array{T} where T <: Number, t::Number, δ::Number, transicoes::Array{T, 2} where T <: Integer, parametros::Parametros, dist=true)
     """
         Entrada:
             populacao: 
@@ -183,8 +202,8 @@ function passoMisto(populacao::Populacao, estadoAtual::Array{T} where T <: Numbe
     end
     
     if populacao.rodada == -1
-        contatos[popSuscetiveis] .+= calculaDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popInfectados, parametros.fKernel) .* parametros.θᵢ(t)[popSuscetiveis]
-        contatos[popSuscetiveis] .+= calculaDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popAssintomaticos, parametros.fKernel) .* parametros.θₐ(t)[popSuscetiveis]
+        contatos[popSuscetiveis] .+= calculaDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popInfectados, parametros.fKernel, dist) .* parametros.θᵢ(t)[popSuscetiveis]
+        contatos[popSuscetiveis] .+= calculaDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popAssintomaticos, parametros.fKernel, dist) .* parametros.θₐ(t)[popSuscetiveis]
     else
         contatos[popSuscetiveis] .+= leDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popInfectados) .* parametros.θᵢ(t)[popSuscetiveis]
         contatos[popSuscetiveis] .+= leDistancia(populacao, transicoes[:, 2], parametros.cargaViral, t, popSuscetiveis, popAssintomaticos) .* parametros.θₐ(t)[popSuscetiveis]
@@ -218,7 +237,7 @@ function passoMisto(populacao::Populacao, estadoAtual::Array{T} where T <: Numbe
 end
 
 function evolucaoMista(
-    populacao::Populacao, tempos::AbstractArray{T} where T <: Number, parametros::Parametros; timing=false)
+    populacao::Populacao, tempos::AbstractArray{T} where T <: Number, parametros::Parametros; timing=false, dist=true)
     """
         Entrada:
             populacao: 
@@ -243,7 +262,7 @@ function evolucaoMista(
 
     estadoAtual = copy(populacao.estadoInicial)
     for (k, δ) in enumerate(passos)
-        estadoAtual .= passoMisto(populacao, estadoAtual, k, δ, transicoes, parametros)
+        estadoAtual .= passoMisto(populacao, estadoAtual, k, δ, transicoes, parametros, dist)
         
         S[k+1] = sum(estadoAtual .== 1)
         E[k+1] = sum(estadoAtual .== 2)
@@ -255,11 +274,31 @@ function evolucaoMista(
     return S,E,A,I,R,transicoes
 end
 
-macro evolucaoParalela(populacao, tempos, parametros, nSim)
-    return :(pmap((i)->evolucaoMista($populacao, $tempos, $parametros), 1:$nSim))
+function map2matriz(a)
+    (nSim, nT) = (length(a), length(a[1][1]))
+    S = zeros(nSim, nT)
+    E = zeros(nSim, nT)
+    A = zeros(nSim, nT)
+    I = zeros(nSim, nT)
+    R = zeros(nSim, nT)
+    transicoes = zeros(nSim, size(a[1][6])[1], 3)
+    
+    for (i, j) in enumerate(a)
+        S[i, :] = j[1]
+        E[i, :] = j[2]
+        A[i, :] = j[3]
+        I[i, :] = j[4]
+        R[i, :] = j[5]
+        transicoes[i, :, :] = j[6]
+    end
+    return S, E, A, I, R, transicoes
 end
 
-function geraQuadrado(nPessoas, geradorResidencias, geradorθᵢ, geradorθₐ, shift, nRes, nBai, limitPop=5000)
+macro evolucaoParalela(populacao, tempos, parametros, nSim, dist=true)
+    return :(map2matriz(pmap((i)->evolucaoMista($populacao, $tempos, $parametros, dist=$dist), 1:$nSim)))
+end
+
+function geraQuadrado(nPessoas, geradorResidencias, geradorθᵢ, geradorθₐ, shift, nRes, nBai, totalPessoas, limitPop=5000)
     residencia = geradorResidencias(nPessoas)
     nResidencias = maximum(residencia)
     residencias = [Int[] for i in 1:nResidencias]   
@@ -276,7 +315,7 @@ function geraQuadrado(nPessoas, geradorResidencias, geradorθᵢ, geradorθₐ, 
         for i in 1:nResidencias
     ]
     
-    listaResidencias = [Particula(nRes + i, length(j), j, residenciasBai[i] + nBai, residenciasPos[i, :] .+ shift, geradorθᵢ(), geradorθₐ()) for (i, j) in enumerate(residencias)]
+    listaResidencias = [Particula(nRes + i, length(j), copy(j) .+ totalPessoas, residenciasBai[i] + nBai, residenciasPos[i, :] .+ shift, geradorθᵢ(), geradorθₐ()) for (i, j) in enumerate(residencias)]
 
     # determina a posicao e bairro de cada pessoa
     posicao = zeros(nPessoas, 2)
@@ -303,11 +342,13 @@ function geraRedeResidencial(dadosPessoas, geradorResidencias, geradorθᵢ, ger
     posicoes = zeros(0, 2)
     nRes = 0
     nBai = 0
+    totalPessoas = 0
     for k in indices
         j = ceil(Int, k / n)
         i = k - (j - 1) * n
-        (sqnDivisoes, residencia, bairro, posicao, listaResidencia, residenciaBai) = geraQuadrado(dadosPessoas[k], geradorResidencias, geradorθᵢ, geradorθₐ, [j-1, i-1], nBai, limitPop)
+        (sqnDivisoes, residencia, bairro, posicao, listaResidencia, residenciaBai) = geraQuadrado(dadosPessoas[k], geradorResidencias, geradorθᵢ, geradorθₐ, [j-1, i-1], nRes, nBai, totalPessoas, limitPop)
         
+        totalPessoas += dadosPessoas[k]
         append!(listaResidencias, listaResidencia)
         append!(residenciasBai, residenciaBai .+ nBai)
         append!(residencias, residencia .+ nRes)

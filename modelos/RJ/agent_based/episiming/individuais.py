@@ -22,7 +22,16 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import matplotlib.colors as c
+
 bernoulli = False
+
+def color_to_rgba(cor, alpha):
+    cor_rgba = tuple(np.array(c.to_rgba(cor, alpha = alpha/255))*255)
+    return 'rgba'+ str(cor_rgba)
 
 def passo_vetorial(pop_estado, redes, redes_tx_transmissao,
                    pop_fator_tx_transmissao_c, prob_nao_recuperacao,
@@ -836,6 +845,499 @@ def evolucao_matricial(pop_0, G, gamma, kappa, infectados_contador_0, tempos, nu
         I_sigma,
         R_sigma,
         S_sigma
+    )
+
+    return resultado
+
+
+def evolucao_grafo_estruturado(pop_0, p, lamb, mu, theta, sigma, rho, gammaA, epsA, gammaI, epsI, dI, gammaD, dD, G, tempos, num_sim, show='', toprint = False):
+    """Evolução temporal da epidemia em um grafo estruturado.
+
+
+    Entrada:
+        pop_0: numpy.array
+            state of the population, with 
+                1: suscetível
+                2: exposto
+                3: infectado
+                4: recuperado
+                5: decesso
+                6: diagnosticado
+                7: quarentenado
+                8: infectado assintomático
+
+
+        G: numpy.array
+            grafo de conexões
+
+        tempos: numpy.array
+            instantes de tempo
+
+        num_sim: int
+            número de simulações
+
+        show: str
+            indica se é para exibir um gráfico e de que tipo:
+                - 'nuvem': exibe uma nuvem com todas as simulações e o valor médio em destaque
+                - 'sd': exibe o valor médio com um intervalo de confiança dado pelo desvio padrão
+                - 'medio': exibe apenas o valor médio
+                - '': não exibe gráfico algum.
+
+    Saída
+        X: class.SEIRMQDA_Individual
+            Uma instância da classe `SEIRMQDA_Individual` com os seguintes atributos:
+                pop_0:
+                num_pop:
+                .
+                parâmetros:
+                .
+                G:
+                tempos:
+                num_sim:
+                S_mean:
+                E_mean: 
+                I_mean: 
+                R_mean:
+                M_mean:
+                D_mean:
+                Q_mean:
+                A_mean:
+                S_sigma:
+                E_sigma: 
+                I_sigma: 
+                R_sigma:
+                M_sigma:
+                D_sigma:
+                Q_sigma:
+                A_sigma:
+    """
+    def passo_grafo_estruturado(num_pop, populacao, A_adj, prob_entrar_quar, prob_sair_quar,prob_infeccao, prob_infeccao_assint, prob_incubacao, proporcao_inf, prob_recuperacao_assint, prob_diagnosticar_assint, prob_recuperacao_inf, prob_diagnosticar_inf, prob_morte_inf, prob_recuperacao_diagnost, prob_morte_diagnost):
+        
+        
+        # gera uma matriz cheia aleatória (números em [0.0,1.0)) (para usarmos nos infectados sintomaticos)
+        A_random = np.random.rand(num_pop, num_pop)*2
+        
+        # filtra de acordo com as conexões
+        A_graph_random = np.multiply(A_adj, A_random)
+        
+        # copia a população (acho que é desnecessário)
+        pop_aux = np.copy(populacao)
+        
+        # separa os suscetíveis, criando um vetor de 1's e 0's, se for, ou não, suscetível
+        pop_suscetiveis = np.select([pop_aux==1], [pop_aux])
+        
+        # separa os infectados, criando um vetor de 1's e 0's, se for, ou não, exposto
+        pop_expostos = np.select([pop_aux==2], [pop_aux])/2
+        
+        # separa os infectados, criando um vetor de 1's e 0's, se for, ou não, infectado
+        pop_infectados = np.select([pop_aux==3], [pop_aux])/3
+        
+        # separa os assintomaticos, criando um vetor de 1's e 0's, se for, ou não, assintomatico
+        pop_assintomaticos = np.select([pop_aux==8], [pop_aux])/8
+        
+        # separa os quarentenados, criando um vetor de 1's e 0's, se for, ou não, quarentenados
+        pop_quarentenados = np.select([pop_aux==6], [pop_aux])/6
+        
+        # separa os diagnosticados, criando um vetor de 1's e 0's, se for, ou não, diagnosticados
+        pop_diagnosticados = np.select([pop_aux==7], [pop_aux])/7
+        
+        # cria uma matriz de risco, mantendo apenas as conexões que envolvem um infectado
+        A_risco = np.multiply(np.tile(pop_infectados, (num_pop, 1)), A_graph_random)
+        
+        # cria uma matriz de risco, mantendo apenas as conexões que envolvem um assintomatico
+        B_risco = np.multiply(np.tile(pop_assintomaticos, (num_pop, 1)), A_graph_random)
+        
+        # cria matriz de contatos entre um suscetível e um infectado
+        A_contatos = np.multiply(np.tile(pop_suscetiveis, (num_pop, 1)).transpose(), A_risco)
+        
+        # cria matriz de contatos entre um suscetível e um assintomatico
+        B_contatos = np.multiply(np.tile(pop_suscetiveis, (num_pop, 1)).transpose(), B_risco)
+        
+        # cria uma matriz de 1's e 0's, indicando se houve, ou não, contágio
+        A_expostos = np.select([np.logical_or(np.logical_and(A_contatos<1,A_contatos > 1-prob_infeccao), np.logical_and(B_contatos <1,
+        B_contatos > 1-prob_infeccao_assint))], 
+                               [np.ones([num_pop, num_pop])])
+
+        # obtém novos expostos
+        pop_novos_expostos = np.select([np.sum(A_expostos, axis=1)>0], [np.ones(num_pop)])
+         
+        # filtra matriz aleatória com a diagonal
+        pop_quarentenando = pop_suscetiveis @ np.multiply(np.eye(num_pop), A_random)
+        pop_saindo_quar = pop_quarentenados @ np.multiply(np.eye(num_pop), A_random)/2
+        pop_incubando = pop_expostos @ np.multiply(np.eye(num_pop), A_random)/2
+        # pop_inf_mudanca = pop_infectados * np.random.rand(num_pop)/2
+        # pop_assint_mudanca = pop_assintomaticos * np.random.rand(num_pop)/2
+        pop_inf_mudanca = pop_infectados @ np.multiply(np.eye(num_pop), A_random)/2
+        pop_assint_mudanca = pop_assintomaticos @ np.multiply(np.eye(num_pop), A_random)/2
+        # pop_inf_mudanca = pop_infectados * np.random.rand(num_pop)/2
+        # pop_diagnost_mudanca = pop_diagnosticados * np.random.rand(num_pop)/2
+        pop_diagnost_mudanca = pop_diagnosticados @ np.multiply(np.eye(num_pop), A_random)/2
+        
+        # obtém novos quarentenados
+        pop_novos_quarentenados = np.select([pop_quarentenando > 2-prob_entrar_quar], 
+                                            [np.ones(num_pop)])
+        
+
+        # obtém novos suscetiveis
+        pop_novos_suscetiveis = np.select([pop_saindo_quar > 1-prob_sair_quar], ##np.logical_and(pop_saindo_quar > 1-prob_sair_quar, pop_novos_expostos == 0)
+                                            [np.ones(num_pop)])
+        
+        # obtém vetor de valores pós incubação
+        pop_fim_incubacao = np.select([pop_incubando > 1-prob_incubacao], [np.ones(num_pop)]) * np.random.rand(num_pop)
+        
+        #obtém novos assintomáticos
+        pop_novos_assintomaticos = np.select([pop_fim_incubacao > proporcao_inf], [np.ones(num_pop)])
+        
+        #obtém novos infectados
+        pop_novos_infectados = np.select([np.logical_and(pop_fim_incubacao <=  proporcao_inf, pop_fim_incubacao > 0)], 
+                                                             [np.ones(num_pop)])
+    
+        
+        # obtém novos recuperados
+        pop_novos_recuperados = np.select([np.logical_or.reduce([
+            np.logical_and(3*pop_inf_mudanca > 1-  prob_recuperacao_inf,3*pop_inf_mudanca < 1),
+            np.logical_and(2*pop_diagnost_mudanca > 1-  prob_recuperacao_diagnost,2*pop_diagnost_mudanca < 1),  
+            np.logical_and(2*pop_assint_mudanca > 1-  prob_recuperacao_assint,2*pop_assint_mudanca < 1)])],
+            [np.ones(num_pop)])
+
+        # pop_novos_recuperados = np.select([np.logical_or.reduce([pop_inf_mudanca > 1-  prob_recuperacao_inf, 
+        #                                                  pop_diagnost_mudanca > 1 - prob_recuperacao_diagnost,
+        #                                                 pop_assint_mudanca > 1 - prob_recuperacao_assint])], 
+        #                                                 [np.ones(num_pop)])
+        
+        # obtém novos mortos
+        pop_novos_mortos = np.select([np.logical_or.reduce([
+            np.logical_and(3*pop_inf_mudanca > 2-  prob_morte_inf,3*pop_inf_mudanca < 2),
+            np.logical_and(2*pop_diagnost_mudanca > 2-  prob_morte_diagnost,2*pop_diagnost_mudanca < 2)])],
+            [np.ones(num_pop)])
+
+        # pop_novos_mortos = np.select([np.logical_or(np.logical_and(pop_inf_mudanca > 1-prob_morte_inf, 
+        #                                                            pop_novos_recuperados == 0), 
+        #                                             np.logical_and(pop_diagnost_mudanca > 1 - prob_morte_diagnost, 
+        #                                                            pop_novos_recuperados == 0))], [np.ones(num_pop)])
+        
+        # obtém novos diagnosticados
+        pop_novos_diagnosticados = np.select([np.logical_or.reduce([
+            np.logical_and(3*pop_inf_mudanca > 3-  prob_diagnosticar_inf,3*pop_inf_mudanca < 3),
+            np.logical_and(2*pop_assint_mudanca > 2-  prob_diagnosticar_assint,2*pop_assint_mudanca < 2)])],
+            [np.ones(num_pop)])
+
+        # pop_novos_diagnosticados = np.select([np.logical_or(np.logical_and.reduce([pop_inf_mudanca > 1-prob_diagnosticar_inf, 
+        #                                                       pop_novos_recuperados == 0, pop_novos_mortos == 0]),
+        #                                                       np.logical_and(pop_assint_mudanca > 1-prob_diagnosticar_assint, 
+        #                                                       pop_novos_recuperados == 0))],
+        #                                                       [np.ones(num_pop)])
+        
+        #obtém suscetives
+        suscetiveis = np.select([np.logical_or(np.logical_and.reduce([pop_suscetiveis == 1, pop_novos_expostos == 0, 
+                                                       pop_novos_quarentenados == 0]), pop_novos_suscetiveis == 1)], [np.ones(num_pop)])
+
+        #obtém expostos
+        expostos = np.select([np.logical_or(np.logical_and.reduce([pop_expostos == 1, 
+                                                                    pop_novos_infectados == 0, pop_novos_assintomaticos == 0]), ##, pop_novos_mortos == 0 
+                                                                    pop_novos_expostos == 1)], [np.ones(num_pop)])
+ 
+        
+        #obtém infectados
+        infectados = np.select([np.logical_or(np.logical_and.reduce([pop_infectados == 1, 
+                                                                    pop_novos_recuperados == 0, pop_novos_mortos == 0, 
+                                                                    pop_novos_diagnosticados == 0]), 
+                                                                    pop_novos_infectados == 1)], [np.ones(num_pop)])
+        #obtém assintomaticos
+        assintomaticos = np.select([np.logical_or(np.logical_and.reduce([pop_assintomaticos == 1, 
+                                                                    pop_novos_recuperados == 0, pop_novos_diagnosticados == 0]), 
+                                                                    pop_novos_assintomaticos == 1)], [np.ones(num_pop)])
+        
+        
+        
+        #obtém recuperados
+        pop_recuperados = np.select([pop_aux == 4], [pop_aux])/4
+        recuperados = np.select([np.logical_or(pop_recuperados == 1, pop_novos_recuperados == 1)], [np.ones(num_pop)])
+        
+        #obtém recuperados
+        pop_mortos = np.select([pop_aux == 5], [pop_aux])/5
+        mortos = np.select([np.logical_or(pop_mortos == 1, pop_novos_mortos == 1)], [np.ones(num_pop)])
+        
+        #obtém quarentenados
+        quarentenados = np.select([np.logical_or(np.logical_and.reduce([pop_quarentenados == 1, 
+                                                       pop_novos_suscetiveis == 0]), pop_novos_quarentenados == 1)], 
+                                  [np.ones(num_pop)])
+        
+        #obtém diagnosticados
+        diagnosticados = np.select([np.logical_or(np.logical_and.reduce([pop_diagnosticados == 1, pop_novos_recuperados == 0,
+                                                                        pop_novos_mortos == 0]), pop_novos_diagnosticados == 1)], 
+                                  [np.ones(num_pop)])
+        
+        # atualiza população adicionando um aos que avançaram de estágio
+        populacao_nova = suscetiveis + 2*expostos + 3*infectados + 4*recuperados + 5*mortos + 6*quarentenados + 7*diagnosticados + 8*assintomaticos
+
+        # Observe que cada elemento da matriz aleatória é usado apenas uma vez, garantindo
+        # a independência desses eventos aleatórios (tanto quanto se leve em consideração
+        # que os números gerados são pseudo-aleatórios)
+        
+        
+        return populacao_nova
+
+    
+    # confere se escolha para `show` é válida
+    if show:
+        assert(show in ('nuvem', 'sd', 'media')), 'Valor inválido para argumento `show`.'
+
+    # atributos de saída
+    SEIRMQDA_Individual = namedtuple('SEIRMQDA_Individual', 
+                                [
+                                    'pop_0',
+                                    'num_pop',
+                                    'p',
+                                    'lamb',
+                                    'mu',
+                                    'theta',
+                                    'sigma',
+                                    'rho',
+                                    'gammaA',
+                                    'epsA',
+                                    'gammaI',
+                                    'epsI',
+                                    'dI',
+                                    'gammaD',
+                                    'dD',
+                                    'G',
+                                    'tempos',
+                                    'num_sim',
+                                    'S_mean',
+                                    'E_mean',
+                                    'I_mean', 
+                                    'R_mean',
+                                    'M_mean',
+                                    'Q_mean',
+                                    'D_mean',
+                                    'A_mean',
+                                    'S_sigma',
+                                    'E_sigma',
+                                    'I_sigma', 
+                                    'R_sigma',
+                                    'M_sigma',
+                                    'Q_sigma',
+                                    'D_sigma',
+                                    'A_sigma',
+                                    'data_plot'
+                                ])
+    
+    # número de indivíduos da população
+    num_pop = len(pop_0)
+    I_0 = np.count_nonzero(pop_0==3)        
+
+    # número de instantes no tempo e passos de tempo 
+    num_t = len(tempos)
+    passos_de_tempo = tempos[1:] - tempos[:-1]
+
+    # inicializa variáveis para o cálculo da média
+    S_mean = np.zeros(num_t)
+    E_mean = np.zeros(num_t)
+    I_mean = np.zeros(num_t)
+    R_mean = np.zeros(num_t)
+    M_mean = np.zeros(num_t)
+    Q_mean = np.zeros(num_t)
+    D_mean = np.zeros(num_t)
+    A_mean = np.zeros(num_t)
+
+    # inicializa variáveis para o cálculo do desvio padrão
+    S_sigma = np.zeros(num_t)
+    E_sigma = np.zeros(num_t)
+    I_sigma = np.zeros(num_t)
+    R_sigma = np.zeros(num_t)
+    M_sigma = np.zeros(num_t)
+    Q_sigma = np.zeros(num_t)
+    D_sigma = np.zeros(num_t)
+    A_sigma = np.zeros(num_t)
+
+    
+    # obtém matriz de adjacências e o número médio de vizinhos do grafo
+    A_adj = nx.to_numpy_matrix(G)
+
+    # prepara gráfico se necessário
+    if show in ('nuvem', 'sd', 'media'):    
+        # inicializa figura e define eixo vertical
+        fig = go.Figure()
+        fig.update_layout(height=650, width=989, xaxis = dict(range = [tempos[0], tempos[-1]]), yaxis = dict(range = [0,num_pop]))
+        colors = ['blue', 'purple', 'red', 'green', 'black', 'deeppink', 'brown', 'orange', 'grey']
+    
+    if show == 'nuvem':
+        # alpha para a nuvem de gráficos das diversas simulaçõe
+        alpha = min(0.2, 5/num_sim) 
+        new_colors = [color_to_rgba(c, alpha) for c in colors]
+        
+    # simulações
+    for j in range(num_sim):
+        if toprint:
+            print(j)
+
+        # inicializa população de cada simulação
+        populacao = np.copy(pop_0)
+        S = np.array([num_pop - I_0])
+        E = np.array([0])
+        I = np.array([I_0])
+        R = np.array([0])
+        M = np.array([0])
+        Q = np.array([0])
+        D = np.array([0])
+        A = np.array([0])
+     
+        
+        # evolui o dia e armazena as novas contagens
+        for dt in passos_de_tempo:
+
+            # calcula probabilidades
+            prob_entrar_quar =  1 - np.exp(-p*dt)
+            prob_sair_quar =  1 - np.exp(-lamb*dt)
+            prob_infeccao = 1 - np.exp(-mu*dt)
+            prob_infeccao_assint = 1 - np.exp(-theta*dt)
+            prob_incubacao = 1 - np.exp(-sigma*dt)
+            proporcao_inf = rho
+            prob_recuperacao_assint = 1 - np.exp(-gammaA*dt)
+            prob_diagnosticar_assint = 1 - np.exp(-epsA*dt)
+            prob_recuperacao_inf = 1 - np.exp(-gammaI*dt)
+            prob_diagnosticar_inf = 1 - np.exp(-epsI*dt)
+            prob_morte_inf = 1 - np.exp(-dI*dt)
+            prob_recuperacao_diagnost = 1 - np.exp(-gammaD*dt)
+            prob_morte_diagnost = 1 - np.exp(-dD*dt)
+
+            populacao = passo_grafo_estruturado(num_pop, populacao, A_adj,prob_entrar_quar, 
+                                                prob_sair_quar,prob_infeccao, prob_infeccao_assint, 
+                                                prob_incubacao, proporcao_inf, prob_recuperacao_assint, 
+                                                prob_diagnosticar_assint, prob_recuperacao_inf, prob_diagnosticar_inf, 
+                                                prob_morte_inf, prob_recuperacao_diagnost, prob_morte_diagnost)
+            
+            S = np.hstack([S, np.count_nonzero(populacao==1)])
+            E = np.hstack([E, np.count_nonzero(populacao==2)])
+            I = np.hstack([I, np.count_nonzero(populacao==3)])
+            R = np.hstack([R, np.count_nonzero(populacao==4)])
+            M = np.hstack([M, np.count_nonzero(populacao==5)])
+            Q = np.hstack([Q, np.count_nonzero(populacao==6)])
+            D = np.hstack([D, np.count_nonzero(populacao==7)])
+            A = np.hstack([A, np.count_nonzero(populacao==8)])
+            
+            
+        # adiciona as contagens dessa simulação para o cálculo final da média
+        S_mean += S
+        E_mean += E
+        I_mean += I
+        R_mean += R
+        M_mean += M
+        Q_mean += Q
+        D_mean += D
+        A_mean += A
+
+        # adiciona as contagens dessa simulação para o cálculo final do desvio padrão
+        S_sigma += S ** 2
+        E_sigma += E ** 2
+        I_sigma += I ** 2
+        R_sigma += R ** 2
+        M_sigma += M ** 2
+        Q_sigma += Q ** 2
+        D_sigma += D ** 2
+        A_sigma += A ** 2
+
+        if show == 'nuvem':
+            # exibe os gráficos dos dados de cada simulação
+            
+            fig.add_trace(go.Scatter(x = tempos, y = S, marker = dict(color = new_colors[0]), name = 'Suscetíveis (simulações)', legendgroup = 'Suscetíveis', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = E, marker = dict(color = new_colors[1]), name = 'Expostos (simulações)', legendgroup = 'Expostos', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = I, marker = dict(color = new_colors[2]), name = 'Infectados (simulações)', legendgroup = 'Infectados', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = R, marker = dict(color = new_colors[3]), name = 'Recuperados (simulações)', legendgroup = 'Recuperados', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = M, marker = dict(color = new_colors[4]), name = 'Óbitos (simulações)', legendgroup = 'Óbitos', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = Q, marker = dict(color = new_colors[5]), name = 'Quarentenados (simulações)', legendgroup = 'Quarentenados', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = D, marker = dict(color = new_colors[6]), name = 'Diagnosticados (simulações)', legendgroup = 'Diagnosticados', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = A, marker = dict(color = new_colors[7]), name = 'Assintomáticos (simulações)', legendgroup = 'Assintomáticos', showlegend = False))
+            fig.add_trace(go.Scatter(x = tempos, y = num_pop - S - Q, marker = dict(color = new_colors[8]), name = 'Afestados pela doença (simulações)', legendgroup = 'Afetados', showlegend = False))
+    # divide pelo número de evoluções para obter a média
+    S_mean /= num_sim
+    E_mean /= num_sim
+    I_mean /= num_sim
+    R_mean /= num_sim
+    M_mean /= num_sim
+    Q_mean /= num_sim
+    D_mean /= num_sim
+    A_mean /= num_sim
+
+    # ajusta o calcula do desvio padrão
+    S_sigma = ( S_sigma / num_sim - S_mean**2 )**.5
+    E_sigma = ( E_sigma / num_sim - E_mean**2 )**.5
+    I_sigma = ( I_sigma / num_sim - I_mean**2 )**.5
+    R_sigma = ( R_sigma / num_sim - R_mean**2 )**.5
+    M_sigma = ( M_sigma / num_sim - M_mean**2 )**.5
+    Q_sigma = ( Q_sigma / num_sim - Q_mean**2 )**.5
+    D_sigma = ( D_sigma / num_sim - D_mean**2 )**.5
+    A_sigma = ( A_sigma / num_sim - A_mean**2 )**.5
+
+    # exibe os gráficos das médias
+    if show in ('nuvem', 'sd', 'media'):
+        new_colors = [color_to_rgba(c, alpha = 0.2) for c in colors]
+        compartimentos = [S_mean, E_mean, I_mean, R_mean, M_mean, Q_mean, D_mean, A_mean]
+        sigmas = [S_sigma, E_sigma, I_sigma, R_sigma, M_sigma, Q_sigma, D_sigma, A_sigma]
+        nomes = ['Suscetíveis', 'Expostos', 'Infectados', 'Recuperados', 'Óbitos', 'Quarentenados', 'Diagnosticados', 'Assintomáticos', 'Afetados pela doença']
+        for i, comp in enumerate(compartimentos):
+            fig.add_trace(go.Scatter(x = tempos, y = compartimentos[i], marker = dict(color = colors[i]), name = nomes[i], legendgroup = nomes[i], showlegend = True))
+        fig.add_trace(go.Scatter(x = tempos, y = num_pop - S_mean - Q_mean, marker = dict(color = colors[-1]), name = nomes[-1], legendgroup = nomes[-1], showlegend = True))
+ 
+    if show == 'sd':
+        for i, comp in enumerate(compartimentos):
+            fig.add_trace(go.Scatter(x = tempos, y =  compartimentos[i]- sigmas[i], marker = dict(color = colors[i]), name = nomes[i], legendgroup = nomes[i], showlegend = False, line = dict(width = 0)))
+            fig.add_trace(go.Scatter(x = tempos, y =  compartimentos[i] + sigmas[i], marker = dict(color = colors[i]), name = nomes[i], legendgroup = nomes[i], showlegend = False, line = dict(width = 0), fill = 'tonexty', fillcolor = new_colors[i]))
+            
+        fig.add_trace(go.Scatter(x = tempos, y = num_pop - S_mean - Q_mean - S_sigma - Q_sigma , marker = dict(color = colors[-1]), name = nomes[-1], legendgroup = nomes[-1], showlegend = False, line = dict(width = 0)))
+        fig.add_trace(go.Scatter(x = tempos, y = num_pop - S_mean - Q_mean + S_sigma + Q_sigma , marker = dict(color = colors[-1]), name = nomes[-1], legendgroup = nomes[-1], showlegend = False, line = dict(width = 0), fill = 'tonexty', fillcolor = new_colors[-1]))
+ 
+    if show == 'nuvem':
+        fig.update_layout(title = dict(text = 'Evolução do conjunto de simulações e da média', x = 0.5))
+    elif show == 'sd':
+        fig.update_layout(title = dict(text = 'Evolução da média, com o desvio padrão', x = 0.5))
+    elif show == 'media':
+        fig.update_layout(title = dict(text = 'Evolução da média das simulações', x = 0.5))
+
+        
+    # informações para o gráfico
+    if show in ('nuvem', 'sd', 'media'):
+        fig.update_xaxes(title_text = 'tempo')
+        fig.update_yaxes(title_text = 'número de indivíduos')
+        fig.show() 
+
+    resultado = SEIRMQDA_Individual(
+        pop_0,
+        num_pop,
+        p,
+        lamb,
+        mu,
+        theta,
+        sigma,
+        rho,
+        gammaA,
+        epsA,
+        gammaI,
+        epsI,
+        dI,
+        gammaD,
+        dD,
+        G,
+        tempos,
+        num_sim,
+        S_mean,
+        E_mean,
+        I_mean, 
+        R_mean,
+        M_mean,
+        Q_mean,
+        D_mean,
+        A_mean,
+        S_sigma,
+        E_sigma,
+        I_sigma,
+        R_sigma,
+        M_sigma,
+        Q_sigma,
+        D_sigma,
+        A_sigma,
+        fig.data
     )
 
     return resultado
