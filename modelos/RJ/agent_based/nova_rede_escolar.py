@@ -212,6 +212,20 @@ def gera_grafo_rede_escolar(pos_individuos, matriculas):
     attrib_pos_individuos = {j: pos_individuos[j] for j in range(len(pos_individuos))}
     G_esc = nx.random_geometric_graph(num_pop, 0, pos = attrib_pos_individuos)
     for modalidade in matriculas:
-    for escola in modalidade:
+        for escola in modalidade:
             G_esc.add_edges_from([(i,j) for i in escola for j in escola if i < j])
+    
+    nx.set_node_attributes(self.G_esc, self.attr_estado_0)
+    nx.set_edge_attributes(self.G_esc, 1, 'weight')
+
+    self.pop_tx_transmissao_esc = \
+        np.array([self.beta_esc / (1+self.G_esc.degree(i)) 
+                  for i in self.G_esc.nodes])
+
+    attr_transmissao_esc = dict([(i, {'taxa de transmissao': self.
+                                    pop_tx_transmissao_esc[i]}) 
+                               for i in self.G_esc.nodes])
+    nx.set_node_attributes(self.G_esc, attr_transmissao_esc)
+
     return G_esc
+

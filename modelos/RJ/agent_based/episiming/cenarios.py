@@ -22,6 +22,36 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import matplotlib.colors as c
+import nova_rede_escolar
+import gera_infeccao
+
+
+tx_reducao = 100
+grupos = np.array([0, 4, 6, 15, 20, 100])
+fracoes_grupos_2 = np.array([0.14666667, 0.40888889, 0.        , 0.        , 0.        ])
+fracoes_grupos_3 = np.array([0.        , 0.        , 0.25569862, 0.        , 0.        ])
+fracoes_grupos_5 = np.array([0.        , 0.        , 0.        , 0.23945578, 0.        ])
+fracoes_grupos_6 = np.array([0.14346756, 0.39997017, 0.45939074, 0.        , 0.        ])
+fracoes_grupos_7 = np.array([0.        , 0.        , 0.        , 0.        , 0.00673317])
+fracoes_grupos_15 = np.array([0.        , 0.        , 0.07249391, 0.16689342, 0.        ])
+fracoes_grupos_21 = np.array([0.        , 0.        , 0.04097482, 0.        , 0.01296758])
+fracoes_grupos_30 = np.array([0.0303915 , 0.08472782, 0.09731519, 0.22403628, 0.        ])
+fracoes_grupos_35 = np.array([0.        , 0.        , 0.        , 0.11882086, 0.01633416])
+fracoes_grupos_42 = np.array([0.00689038, 0.01920955, 0.02206336, 0.        , 0.00698254])
+fracoes_grupos_105 = np.array([0.        , 0.        , 0.0137896 , 0.03174603, 0.00436409])
+fracoes_grupos_210 = np.array([0.00258389, 0.00720358, 0.00827376, 0.01904762, 0.00261845])
+
+fracoes_grupos = np.array([fracoes_grupos_2,fracoes_grupos_3,fracoes_grupos_5,fracoes_grupos_6,fracoes_grupos_7,
+                          fracoes_grupos_15,fracoes_grupos_21,fracoes_grupos_30,fracoes_grupos_35,fracoes_grupos_42,
+                          fracoes_grupos_105,fracoes_grupos_210])
+modalidades = [2,3,5,6,7,15,21,30,35,42,105,210]
+escolas_pub = np.array([np.load(f'../input/mtrx_escolas/escolaspublicas{m}.npy') for m in modalidades])
+escolas_prv = np.array([np.load(f'../input/mtrx_escolas/escolasprivadas{m}.npy') for m in modalidades])
+matriz_escolas = escolas_pub + escolas_prv
+
+matriz_bairros_finos = np.load(f'../input/geoloc_Bairros_MRJ_fino.npy')
+arq_casos = "infectados_15-06"
+
 
 def color_to_rgba(cor, alpha):
     cor_rgba = tuple(np.array(c.to_rgba(cor, alpha = alpha/255))*255)
@@ -1057,9 +1087,7 @@ class Multi350(Cenario):
         np.random.seed(seed = 342)
         #self.pop_estado_0 = np.ones(num_pop, dtype=np.uint8)
         self.pop_estado_0 = np.ones(self.num_pop)
-        infectados_0 = np.random.choice(self.num_pop,
-                                        self.num_infectados_0, 
-                                        replace=False)
+        infectados_0 = inicia_casos(tx_reducao,arq_casos,matriz_bairros_finos,self.pos_residencias,self.res_individuos)
         #self.pop_estado_0[infectados_0] = \
         #    2*np.ones(num_infectados_0, dtype=np.uint8)
         self.pop_estado_0[infectados_0] = 2*np.ones(self.num_infectados_0)
@@ -1449,7 +1477,9 @@ class RiodeJaneiro(Cenario):
 
     def cria_redes(self):
         self.cria_rede_residencial()
-        self.cria_rede_escolar()
+        matriculas = self.gera_rede_escolar(tx_reducao,self.pos_individuos,self.pop_idades,matriz_escolas
+                                            ,grupos,fracoes_grupos)
+        self.gera_grafo_rede_escolar(self.pos_individuos,matriculas)
         self.cria_rede_empresarial()
         self.redes = [self.G_r, self.G_esc, self.G_emp]
         self.redes_tx_transmissao= [
