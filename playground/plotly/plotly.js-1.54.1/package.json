@@ -153,7 +153,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-verbose-reporter": "0.0.6",
     "karma-viewport": "^1.0.6",
-    "madge": "^3.8.0",
+    "madge": "^4.0.1",
     "minify-stream": "^2.0.0",
     "minimist": "^1.2.5",
     "mkdirp": "^1.0.4",
